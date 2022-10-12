@@ -1,7 +1,6 @@
-using System;
-using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+
+using AnimalCrossing.Shared;
 
 namespace AnimalCrossing.Server {
     class Client {
@@ -18,7 +17,12 @@ namespace AnimalCrossing.Server {
         }
 
         private void handle() {
-            
+            NetworkStream network = this.socket.GetStream();
+            byte[] bytes = new byte[this.socket.ReceiveBufferSize];
+            network.Read(bytes, 0, this.socket.ReceiveBufferSize);
+
+            IMessage message = IMessage.Parse(bytes);
+            message.Act(Program.villages);
         }
     }
 }

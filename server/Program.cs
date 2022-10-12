@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
 
+using AnimalCrossing.Shared;
+
 namespace AnimalCrossing.Server {
     class Program {
         public static List<Village> villages = new List<Village>();

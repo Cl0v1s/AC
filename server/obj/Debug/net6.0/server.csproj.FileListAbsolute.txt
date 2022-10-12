@@ -13,3 +13,6 @@
 /home/clovis/Documents/AC/server/obj/Debug/net6.0/ref/server.dll
 /home/clovis/Documents/AC/server/obj/Debug/net6.0/server.pdb
 /home/clovis/Documents/AC/server/obj/Debug/net6.0/server.genruntimeconfig.cache
+/home/clovis/Documents/AC/server/bin/Debug/net6.0/shared.dll
+/home/clovis/Documents/AC/server/bin/Debug/net6.0/shared.pdb
+/home/clovis/Documents/AC/server/obj/Debug/net6.0/server.csproj.CopyComplete

@@ -1,9 +1,8 @@
 using System.Net;
-using System.Collections.Generic;
 
-namespace AnimalCrossing.Server {
+namespace AnimalCrossing.Shared {
 
-    class Villager {
+    public class Villager {
         public IPAddress Ip { get; set; }
 
         public int port { get; set; }
@@ -14,13 +13,13 @@ namespace AnimalCrossing.Server {
         }
     }
 
-    class Village {
+    public class Village {
 
-        private string password;
+        public string Password { get; }
         private List<Villager> villagers;
 
         public Village(string password) {
-            this.password = password;
+            this.Password = password;
             this.villagers = new List<Villager>();
         }
 
