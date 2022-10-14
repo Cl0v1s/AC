@@ -23,7 +23,7 @@ namespace AnimalCrossing.Server {
                 if(clients.ContainsKey(key) == false) {
                     clients[key] = new Client(Program.villages, server, new IPEndPoint(pair.Address, pair.Port));
                 }
-                clients[key].handle(data);
+                clients[key].Handle(data);
             }
         }
     }
