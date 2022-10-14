@@ -21,7 +21,7 @@ namespace AnimalCrossing.Server {
 
                 string key = pair.Address.ToString() + ":" + pair.Port;
                 if(clients.ContainsKey(key) == false) {
-                    clients[key] = new Client(server, new IPEndPoint(pair.Address, pair.Port));
+                    clients[key] = new Client(Program.villages, server, new IPEndPoint(pair.Address, pair.Port));
                 }
                 clients[key].handle(data);
             }
