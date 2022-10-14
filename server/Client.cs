@@ -1,28 +1,25 @@
+using System.Net;
 using System.Net.Sockets;
 
 using AnimalCrossing.Shared;
 
 namespace AnimalCrossing.Server {
     class Client {
-        private TcpClient socket;
-        private Thread? thread;
-
-        public Client(TcpClient socket) {
+        private UdpClient socket;
+        private IPEndPoint pair;
+        public Client(UdpClient socket, IPEndPoint pair) {
             this.socket = socket;
+            this.pair = pair;
         }
 
-        public void start() {
-            this.thread = new Thread(this.handle);
-            this.thread.Start();
+        public void handle(byte[] data) {
+
+            IMessage message = IMessage.Parse(data);
+            message.Act(this.pair, Program.villages);
         }
 
-        private void handle() {
-            NetworkStream network = this.socket.GetStream();
-            byte[] bytes = new byte[this.socket.ReceiveBufferSize];
-            network.Read(bytes, 0, this.socket.ReceiveBufferSize);
+        public void send(IMessage message) {
 
-            IMessage message = IMessage.Parse(bytes);
-            message.Act(Program.villages);
         }
     }
 }
