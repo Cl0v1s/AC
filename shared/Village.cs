@@ -1,5 +1,7 @@
 using System.Net;
 
+using System.Diagnostics;
+
 namespace AnimalCrossing.Shared {
 
     public class Villager {
@@ -16,19 +18,20 @@ namespace AnimalCrossing.Shared {
     public class Village {
 
         public string Password { get; }
-        private List<Villager> villagers;
+        public List<Villager> Villagers { get; }
 
         public Village(string password) {
             this.Password = password;
-            this.villagers = new List<Villager>();
+            this.Villagers = new List<Villager>();
         }
 
         public void addVillager(Villager villager) {
-            Villager? previous = this.villagers.Find(x => x.Ip == villager.Ip);
+            Villager? previous = this.Villagers.Find(x => x.Ip == villager.Ip);
             if(previous != null) {
-                this.villagers.Remove(previous);
+                this.Villagers.Remove(previous);
             }
-            this.villagers.Add(villager);
+            this.Villagers.Add(villager);
+            Console.WriteLine("Villager added: " + villager.Ip.ToString() + ":" + villager.port);
         }
 
 
