@@ -23,8 +23,8 @@ public class MessageDiscover : IMessage
     public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
         // client side
-        Pair pair = new Pair(this.ReplyTo!.Address, this.ReplyTo.Port);
-        pair.StartSync();
+        Pair pair = new Pair(true, this.ReplyTo!.Address, this.ReplyTo.Port);
+        pair.StartSync(client);
         client.Pairs.Add(pair);
         return new IMessage[] {};
     }

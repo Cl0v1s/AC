@@ -4,18 +4,39 @@ namespace AnimalCrossing.Shared;
 
 public class Pair : IPEndPoint
 {
+    private bool Remote { get;  }
+    
     private bool Synchronized { get; } = false;
     
-    public Pair(long address, int port) : base(address, port)
+    public string Hash { get; private set;  }
+    
+    public DateTime ModifiedAt { get; private set; }
+    
+    public Pair(bool remote, long address, int port) : base(address, port)
     {
+        this.Remote = remote;
+        if(!remote) this.LoadSave();
     }
 
-    public Pair(IPAddress address, int port) : base(address, port)
+    public Pair(bool remote, IPAddress address, int port) : base(address, port)
     {
+        this.Remote = remote;
+        if(!remote) this.LoadSave();
     }
 
-    public void StartSync()
+    private void LoadSave()
     {
         
+    }
+
+    public void StartSync(IMessageHandler handler)
+    {
+        
+    }
+
+    public void HandleSyncInit(IMessageHandler handler, MessageSyncInit message)
+    {
+        this.Hash = message.Hash;
+        this.ModifiedAt = message.ModifiedAt;
     }
 }

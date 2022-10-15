@@ -25,7 +25,7 @@ public class MessageCharlyResponse : IMessage
     {
         // client side
         Console.WriteLine("Now I known I'm " + this.To?.Address + ":" + this.To?.Port);
-        if(this.To != null) client.Self = this.To;
+        if(this.To != null) client.Self = new Pair(false, this.To.Address, this.To.Port);
         return new IMessage[] {};
     }
 

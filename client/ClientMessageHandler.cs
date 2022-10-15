@@ -34,7 +34,7 @@ public class ClientMessageHandler : IMessageHandler
                 this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port);
             if (pair == null)
             {
-                this.Pairs.Add(new Pair(sender.Address, sender.Port));
+                this.Pairs.Add(new Pair(true, sender.Address, sender.Port));
             }
         }
 
