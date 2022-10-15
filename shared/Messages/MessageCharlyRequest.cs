@@ -6,23 +6,39 @@ public class MessageCharlyRequest : IMessage
 {
     public MessageTypes Type { get; set; }
     public IPEndPoint? ReplyTo { get; set; }
+    public IPEndPoint? From { get; set; }
+    public IPEndPoint? To { get; set; }
 
     private string Password { get; set; }
     
     public MessageCharlyRequest() {}
 
-    public MessageCharlyRequest(string password)
+    public MessageCharlyRequest(IPEndPoint to, string password)
     {
+        // client side
         this.Type = MessageTypes.CharlyRequest;
-        this.ReplyTo = new IPEndPoint(IPAddress.Any, 0);
+        this.ReplyTo = null;
+        this.From = null;
+        this.To = to;
         this.Password = password;
     }
 
-    public IMessage Act(IMessageHandler client, IPEndPoint sender)
+    public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
         // serverside
         //TODO: do something with password
-        return new MessageCharlyResponse(sender);
+        List<IMessage> responses = new List<IMessage>() { new MessageCharlyResponse(client.Self!, sender) };
+
+        client.Pairs.ForEach((pair) =>
+        {
+            if (pair.Address.ToString() != sender.Address.ToString() || pair.Port != sender.Port)
+            {
+                responses.Add(new MessageDiscover(client.Self!, pair, sender));
+                responses.Add(new MessageDiscover(client.Self!, sender, pair));
+            }
+        });
+
+        return responses.ToArray();
     }
 
     public void Serialize(BinaryWriter bw)

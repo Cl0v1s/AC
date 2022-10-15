@@ -7,7 +7,9 @@ public interface IMessageHandler
 {
     UdpClient Client { get;  }
     
-    IPEndPoint Self { get; set; }
+    IPEndPoint? Self { get; set; }
     
-    void Send(IPEndPoint endpoint, IMessage message);
+    List<IPEndPoint> Pairs { get; set; }
+    
+    void Send(IMessage message);
 }

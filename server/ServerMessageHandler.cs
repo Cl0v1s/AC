@@ -6,33 +6,41 @@ namespace AnimalCrossing.Server;
 
 public class ServerMessageHandler : IMessageHandler
 {
-    private List<IPEndPoint> _clients;
     public UdpClient Client { get; }
-    public IPEndPoint Self { get; set; }
+    public IPEndPoint? Self { get; set; }
+    
+    public List<IPEndPoint> Pairs { get; set; }
 
     public ServerMessageHandler(IPEndPoint self, UdpClient client)
     {
+        this.Pairs = new List<IPEndPoint>();
         this.Client = client;
-        this._clients = new List<IPEndPoint>();
         this.Self = self;
     }
 
     public void Receive(IPEndPoint sender, byte[] data)
     {
+        IPEndPoint? client =
+            this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port);
+        if(client == null) this.Pairs.Add(sender);
+        
         IMessage message = IMessage.Parse(data);
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
-        IMessage? response = message.Act(this, sender);
-        if(response != null) this.Send(response.ReplyTo ?? sender, response);
+        IMessage[] responses = message.Act(this, sender);
+        foreach (IMessage response in responses)
+        {
+            this.Send(response);
+        }
     }
     
-    public void Send(IPEndPoint endpoint, IMessage message)
+    public void Send(IMessage message)
     {
-        Console.WriteLine("Sending " + message.Type + " to " + endpoint.Address + ":" + endpoint.Port);
+        Console.WriteLine("Sending " + message.Type + " to " + message.To.Address + ":" + message.To.Port);
         MemoryStream stream = new MemoryStream();
         BinaryWriter bw = new BinaryWriter(stream);
         message.Serialize(bw);
         byte[] data = stream.ToArray();
-        this.Client.Send(data, data.Length, endpoint);
+        this.Client.Send(data, data.Length, message.To);
         bw.Close();
         stream.Close();
     }

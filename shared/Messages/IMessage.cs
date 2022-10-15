@@ -7,35 +7,53 @@ namespace AnimalCrossing.Shared;
 public enum MessageTypes {
     CharlyRequest = 1,
     CharlyResponse = 2,
-    Tango = 3,
+    Discover = 3,
 }
 
 public interface IMessage {
     public MessageTypes Type { get; set; }
     public IPEndPoint? ReplyTo { get; set; }
+    public IPEndPoint? From { get; set; }
+    public IPEndPoint To { get; set; }
 
-    public IMessage? Act(IMessageHandler client, IPEndPoint sender);
+    public IMessage[] Act(IMessageHandler client, IPEndPoint sender);
 
     public void Serialize(BinaryWriter bw);
     
     public void Deserialize(BinaryReader bw);
 
+    private static void SerializeIpEndpoint(BinaryWriter bw, IPEndPoint? endpoint)
+    {
+        byte[] address = endpoint?.Address.GetAddressBytes() ?? new byte[]{};
+        bw.Write(address.Length);
+        bw.Write(address);
+        bw.Write(endpoint?.Port ?? 0);
+    }
+
+    private static IPEndPoint? DeserializeIpEndpoint(BinaryReader br)
+    {
+        int len = br.ReadInt32();
+        byte[] address = br.ReadBytes(len);
+        int port = br.ReadInt32();
+        if (len == 0) return null;
+        return new IPEndPoint(new IPAddress(address), port);
+    }
+
     public static void Serialize(BinaryWriter bw, IMessage message)
     {
         bw.Write((int)message.Type);
-        byte[] address = message.ReplyTo?.Address.GetAddressBytes() ?? new byte[]{};
-        bw.Write(address.Length);
-        bw.Write(address);
-        bw.Write(message.ReplyTo?.Port ?? 0);
+        IMessage.SerializeIpEndpoint(bw, message.From);
+        IMessage.SerializeIpEndpoint(bw, message.To);
+        IMessage.SerializeIpEndpoint(bw, message.ReplyTo);
 
     }
 
     public static void Deserialize(BinaryReader br, IMessage message)
     {
         // this.type is already parse
-        int len = br.ReadInt32();
-        IPAddress address = new IPAddress(br.ReadBytes(len));
-        message.ReplyTo = new IPEndPoint(address, br.ReadInt32());
+        message.From = IMessage.DeserializeIpEndpoint(br);
+        message.To = IMessage.DeserializeIpEndpoint(br)!;
+        message.ReplyTo = IMessage.DeserializeIpEndpoint(br);
     }
 
     public static IMessage Parse(byte[] data) {
@@ -53,8 +71,8 @@ public interface IMessage {
             case MessageTypes.CharlyResponse:
                 cls = typeof(MessageCharlyResponse);
                 break;
-            case MessageTypes.Tango:
-                cls = typeof(MessageTango);
+            case MessageTypes.Discover:
+                cls = typeof(MessageDiscover);
                 break;
             default:
                 throw new FormatException("Message type does not exists");

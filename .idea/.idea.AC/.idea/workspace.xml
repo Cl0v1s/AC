@@ -6,17 +6,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9e2e04ac-70a8-4bfb-9471-c55b8c3dba9d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/client/ClientMessageHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/Pair.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ClientMessageHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/ClientMessageHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/ClientUser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/ServerMessageHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/IOther.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/IMessageHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/ServerMessageHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/ServerMessageHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/IMessageHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/IMessageHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/Messages/IMessage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Messages/IMessage.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/Messages/MessageCharlyRequest.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Messages/MessageCharlyRequest.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/Messages/MessageCharlyResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Messages/MessageCharlyResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/Messages/MessagePing.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/shared/Messages/MessageTango.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Messages/MessageTango.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

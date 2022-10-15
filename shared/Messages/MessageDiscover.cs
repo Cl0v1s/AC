@@ -2,30 +2,27 @@ using System.Net;
 
 namespace AnimalCrossing.Shared;
 
-public class MessageCharlyResponse : IMessage
+public class MessageDiscover : IMessage
 {
     public MessageTypes Type { get; set; }
     public IPEndPoint? ReplyTo { get; set; }
     public IPEndPoint? From { get; set; }
     public IPEndPoint? To { get; set; }
 
-    public MessageCharlyResponse() {}
-    
-    public MessageCharlyResponse(IPEndPoint from, IPEndPoint to)
+    public MessageDiscover() {}
+
+    public MessageDiscover(IPEndPoint from, IPEndPoint to, IPEndPoint replyTo)
     {
         // server side
-        this.Type = MessageTypes.CharlyResponse;
-        this.ReplyTo = null;
+        this.Type = MessageTypes.Discover;
+        this.ReplyTo = replyTo;
         this.From = from;
         this.To = to;
-
     }
-    
+
     public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
         // client side
-        Console.WriteLine("Now I known I'm " + this.To?.Address + ":" + this.To?.Port);
-        if(this.To != null) client.Self = this.To;
         return new IMessage[] {};
     }
 
