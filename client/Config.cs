@@ -1,11 +1,12 @@
 using System.Text;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace AnimalCrossing.Client;
 
 public class Config
 {
-    private const string ConfigPath = "./config.json";
+    private static readonly string ConfigPath =  System.IO.Directory.GetCurrentDirectory() + "/config.json";
     
     public static Config Instance = File.Exists(ConfigPath) ? 
         JsonConvert.DeserializeObject<Config>(File.ReadAllText(ConfigPath, Encoding.UTF8))! : new Config();

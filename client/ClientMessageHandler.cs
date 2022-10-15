@@ -9,20 +9,35 @@ public class ClientMessageHandler : IMessageHandler
 {
     public UdpClient Client { get; }
     public IPEndPoint? Self { get; set; }
+    
+    private IPEndPoint Server { get; }
+    
     public List<IPEndPoint> Pairs { get; set; }
 
-    public ClientMessageHandler()
+    public ClientMessageHandler(IPEndPoint server)
     {
         this.Pairs = new List<IPEndPoint>();
         this.Self = null;
         this.Client = new UdpClient();
+        this.Server = server;
     }
 
     public void Receive()
     {
         IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
         byte[] data = this.Client.Receive(ref sender);
-        
+
+        // manage pairs
+        if (sender.Address.ToString() != this.Server.Address.ToString() && sender.Port != this.Server.Port)
+        {
+            IPEndPoint? pair =
+                this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port);
+            if (pair == null)
+            {
+                this.Pairs.Add(new Pair(sender.Address, sender.Port));
+            }
+        }
+
         IMessage message = IMessage.Parse(data);
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
         IMessage[] responses = message.Act(this, sender);
