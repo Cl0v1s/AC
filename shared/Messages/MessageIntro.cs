@@ -17,24 +17,17 @@ namespace AnimalCrossing.Shared {
             this.Password = password;
         }
 
-        public Village Act(Client client) {
-            Village? village = client.Villages.Find(x => x.Password == this.Password);
-            Console.WriteLine("Village: " + village + " " + this.Password);
-            if(village == null) {
-                village = new Village(this.Password);
-                client.Villages.Add(village);
-            } 
+        public void Act(IOther client)
+        {
+            client.Village ??= new Village(this.Password); 
 
             // send to all the other villagers how to connect to the new commer 
-            village.Villagers.ForEach((v) => {
-                IMessage message = new MessagePair(client.Pair);
-                client.Send(message, v.Ip, v.port);
+            client.Village.Villagers.ForEach((v) => {
+                IMessage message = new MessagePair((client.Client.Client.RemoteEndPoint as IPEndPoint)!);
+                v.Send(message);
             });
 
-            // add the villager to the village
-            village.addVillager(new Villager(client.Pair.Address, client.Pair.Port));
-
-            return village;
+            client.Village.AddVillager(client);
         }
 
         public void Serialize(BinaryWriter bw) {

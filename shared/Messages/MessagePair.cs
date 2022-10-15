@@ -18,12 +18,13 @@ namespace AnimalCrossing.Shared {
             this.Deserialize(br);
         }
 
-        public Village? Act(Client client) {
-
-            return null;
+        public void Act(IOther client)
+        {
+            Console.WriteLine("Pair to " + this.pair.Address + ":" + this.pair.Port + " received");
         }
 
         public void Serialize(BinaryWriter bw) {
+            bw.Write((int)this.Type);
             byte[] ip = this.pair.Address.GetAddressBytes();
             bw.Write(ip.Length);
             bw.Write(ip);
@@ -31,6 +32,7 @@ namespace AnimalCrossing.Shared {
         }
 
         public void Deserialize(BinaryReader br) {
+            // type is already parsed
             int len = br.ReadInt32();
             byte[] ip = br.ReadBytes(len);
             int port = br.ReadInt32();
