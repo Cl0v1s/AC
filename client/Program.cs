@@ -7,12 +7,19 @@ namespace AnimalCrossing.Client
 {
     class Program
     {
+        public static List<Pair> Pairs = new List<Pair>();
+        
         static void Main(string[] args)
         {
-            Village village = new Village("bonjour");
-
-            Pair server = new Pair(village, IPAddress.Parse(args[0]), int.Parse(args[1]));
-            server.Send(new MessageIntro(village.Password));
+            IPEndPoint server = new IPEndPoint(IPAddress.Parse(args[0]), int.Parse(args[1]));
+            Pair pair = new Pair();
+            
+            pair.Send(server, new MessageCharlyRequest("bonjour"));
+                
+            while (true)
+            {
+                pair.Receive();
+            }
         }
     }
 }

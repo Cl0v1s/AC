@@ -6,30 +6,45 @@ namespace AnimalCrossing.Server;
 
 public class ClientUser : IOther
 {
-    private readonly IPEndPoint _endPoint;
+    private List<IPEndPoint> _clients;
     public UdpClient Client { get; }
-    public Village? Village { get; set; }
+    public IPEndPoint Self { get; set; }
 
-    public ClientUser(UdpClient client, IPAddress address, int port)
+    public ClientUser(IPEndPoint self, UdpClient client)
     {
         this.Client = client;
-        this._endPoint = new IPEndPoint(address, port);
+        this._clients = new List<IPEndPoint>();
+        this.Self = self;
     }
 
-    public void Receive(byte[] data)
+    public void Receive(IPEndPoint sender, byte[] data)
     {
         IMessage message = IMessage.Parse(data);
-        message?.Act(this);
+        Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
+        message.Act(this, sender);
+        Thread.Sleep(5000);
+        if (message is MessageCharlyRequest)
+        {
+            this._clients.ForEach((c) =>
+            {
+                this.Send( c, new MessageTango(sender));
+                Thread.Sleep(1000);
+                this.Send(sender, new MessageTango(c));
+            });                        
+            this._clients.Add(sender);
+        }
     }
     
-    public void Send(IMessage message)
+    public void Send(IPEndPoint endpoint, IMessage message)
     {
+        Console.WriteLine("Sending " + message.Type + " to " + endpoint.Address + ":" + endpoint.Port);
         MemoryStream stream = new MemoryStream();
         BinaryWriter bw = new BinaryWriter(stream);
         message.Serialize(bw);
         byte[] data = stream.ToArray();
-        this.Client.Send(data, data.Length, this._endPoint);
+        this.Client.Send(data, data.Length, endpoint);
         bw.Close();
         stream.Close();
     }
+
 }
