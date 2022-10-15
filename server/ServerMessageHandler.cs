@@ -4,13 +4,13 @@ using AnimalCrossing.Shared;
 
 namespace AnimalCrossing.Server;
 
-public class ClientUser : IOther
+public class ServerMessageHandler : IMessageHandler
 {
     private List<IPEndPoint> _clients;
     public UdpClient Client { get; }
     public IPEndPoint Self { get; set; }
 
-    public ClientUser(IPEndPoint self, UdpClient client)
+    public ServerMessageHandler(IPEndPoint self, UdpClient client)
     {
         this.Client = client;
         this._clients = new List<IPEndPoint>();
@@ -21,18 +21,8 @@ public class ClientUser : IOther
     {
         IMessage message = IMessage.Parse(data);
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
-        message.Act(this, sender);
-        Thread.Sleep(5000);
-        if (message is MessageCharlyRequest)
-        {
-            this._clients.ForEach((c) =>
-            {
-                this.Send( c, new MessageTango(sender));
-                Thread.Sleep(1000);
-                this.Send(sender, new MessageTango(c));
-            });                        
-            this._clients.Add(sender);
-        }
+        IMessage? response = message.Act(this, sender);
+        if(response != null) this.Send(response.ReplyTo ?? sender, response);
     }
     
     public void Send(IPEndPoint endpoint, IMessage message)

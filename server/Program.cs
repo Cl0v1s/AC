@@ -9,7 +9,7 @@ namespace AnimalCrossing.Server {
         {
             IPEndPoint self = new IPEndPoint(IPAddress.Any, int.Parse(args[0]));
             UdpClient socket = new UdpClient(self);
-            ClientUser server = new ClientUser(self, socket);
+            ServerMessageHandler server = new ServerMessageHandler(self, socket);
             Console.WriteLine("Server started...");
 
             while(true) {

@@ -5,12 +5,9 @@ namespace AnimalCrossing.Shared;
 public class MessageTango : IMessage
 {
     public MessageTypes Type { get; set; }
-    public IPEndPoint ReplyTo { get; set; }
+    public IPEndPoint? ReplyTo { get; set; }
 
-    public MessageTango()
-    {
-        this.Type = MessageTypes.Tango;
-    }
+    public MessageTango() {}
 
     public MessageTango(IPEndPoint replyTo)
     {
@@ -18,11 +15,10 @@ public class MessageTango : IMessage
         this.ReplyTo = replyTo;
     }
 
-    public void Act(IOther client, IPEndPoint sender)
+    public IMessage? Act(IMessageHandler client, IPEndPoint sender)
     {
         // client side
-        MessagePing message = new MessagePing();
-        client.Send(this.ReplyTo, message);
+        return null;
     }
 
     public void Serialize(BinaryWriter bw)

@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Runtime;
 
 namespace AnimalCrossing.Shared;
 
 public enum MessageTypes {
-    Ping = 0,
     CharlyRequest = 1,
     CharlyResponse = 2,
     Tango = 3,
@@ -12,9 +12,9 @@ public enum MessageTypes {
 
 public interface IMessage {
     public MessageTypes Type { get; set; }
-    public IPEndPoint ReplyTo { get; set; }
+    public IPEndPoint? ReplyTo { get; set; }
 
-    public void Act(IOther client, IPEndPoint sender);
+    public IMessage? Act(IMessageHandler client, IPEndPoint sender);
 
     public void Serialize(BinaryWriter bw);
     
@@ -23,10 +23,10 @@ public interface IMessage {
     public static void Serialize(BinaryWriter bw, IMessage message)
     {
         bw.Write((int)message.Type);
-        byte[] address = message.ReplyTo.Address.GetAddressBytes();
+        byte[] address = message.ReplyTo?.Address.GetAddressBytes() ?? new byte[]{};
         bw.Write(address.Length);
         bw.Write(address);
-        bw.Write(message.ReplyTo.Port);
+        bw.Write(message.ReplyTo?.Port ?? 0);
 
     }
 
@@ -45,24 +45,23 @@ public interface IMessage {
         MessageTypes type = (MessageTypes)br.ReadInt32();
         Console.WriteLine(type);
 
-        IMessage message;
-
+        Type cls;
         switch(type) {
-            case MessageTypes.Ping:
-                message = new MessagePing();
-                break;
             case MessageTypes.CharlyRequest:
-                message = new MessageCharlyRequest();
+                cls = typeof(MessageCharlyRequest);
                 break;
             case MessageTypes.CharlyResponse:
-                message = new MessageCharlyResponse();
+                cls = typeof(MessageCharlyResponse);
                 break;
             case MessageTypes.Tango:
-                message = new MessageTango();
+                cls = typeof(MessageTango);
                 break;
             default:
                 throw new FormatException("Message type does not exists");
         }
+
+        IMessage message = (IMessage)Activator.CreateInstance(cls)!;
+        message.Type = type;
         message.Deserialize(br);
         
         return message;

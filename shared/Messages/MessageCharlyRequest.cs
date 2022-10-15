@@ -5,14 +5,11 @@ namespace AnimalCrossing.Shared;
 public class MessageCharlyRequest : IMessage
 {
     public MessageTypes Type { get; set; }
-    public IPEndPoint ReplyTo { get; set; }
+    public IPEndPoint? ReplyTo { get; set; }
 
     private string Password { get; set; }
-
-    public MessageCharlyRequest()
-    {
-        this.Type = MessageTypes.CharlyRequest;
-    }
+    
+    public MessageCharlyRequest() {}
 
     public MessageCharlyRequest(string password)
     {
@@ -21,11 +18,11 @@ public class MessageCharlyRequest : IMessage
         this.Password = password;
     }
 
-    public void Act(IOther client, IPEndPoint sender)
+    public IMessage Act(IMessageHandler client, IPEndPoint sender)
     {
         // serverside
         //TODO: do something with password
-        client.Send(sender, new MessageCharlyResponse(sender));
+        return new MessageCharlyResponse(sender);
     }
 
     public void Serialize(BinaryWriter bw)

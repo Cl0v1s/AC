@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace AnimalCrossing.Shared;
 
-public interface IOther
+public interface IMessageHandler
 {
     UdpClient Client { get;  }
     
