@@ -4,20 +4,24 @@ namespace AnimalCrossing.Shared;
 
 public class MessageSyncInit : IMessage
 {
+    private static readonly DateTime EPOCH = new DateTime (1970, 01, 01);
+
+    
     public MessageTypes Type { get; set; }
     public IPEndPoint? ReplyTo { get; set; }
     public IPEndPoint? From { get; set; }
     public IPEndPoint To { get; set; }
     
-    public string Hash { get; }
+    public string Hash { get; set; }
     
-    public DateTime ModifiedAt { get; }
+    public DateTime ModifiedAt { get; set; }
     
     public MessageSyncInit() {}
 
     public MessageSyncInit(IPEndPoint from, IPEndPoint to, string hash, DateTime modifiedAt)
     {
-        // client side
+        this.Type = MessageTypes.SyncInit;
+        // client side init
         this.From = from;
         this.To = to;
         this.Hash = hash;
@@ -26,22 +30,22 @@ public class MessageSyncInit : IMessage
     
     public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
-        // client side
-        Pair? pair =
-            client.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port) as Pair;
-        if (pair == null) throw new KeyNotFoundException("Pair must exists at this point.");
-        pair.HandleSyncInit(client, this);
-
+        // client side dest
+        Console.WriteLine("Other Hash: " + this.Hash + " AT " + this.ModifiedAt);
         return new IMessage[] { };
     }
 
     public void Serialize(BinaryWriter bw)
     {
-        throw new NotImplementedException();
+        IMessage.Serialize(bw, this);
+        bw.Write(this.Hash);
+        bw.Write((this.ModifiedAt - MessageSyncInit.EPOCH).TotalSeconds);
     }
 
-    public void Deserialize(BinaryReader bw)
+    public void Deserialize(BinaryReader br)
     {
-        throw new NotImplementedException();
+        IMessage.Deserialize(br, this);
+        this.Hash = br.ReadString();
+        this.ModifiedAt = EPOCH.AddSeconds(br.ReadDouble());
     }
 }

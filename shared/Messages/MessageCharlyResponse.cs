@@ -7,7 +7,7 @@ public class MessageCharlyResponse : IMessage
     public MessageTypes Type { get; set; }
     public IPEndPoint? ReplyTo { get; set; }
     public IPEndPoint? From { get; set; }
-    public IPEndPoint? To { get; set; }
+    public IPEndPoint To { get; set; }
 
     public MessageCharlyResponse() {}
     
@@ -24,8 +24,9 @@ public class MessageCharlyResponse : IMessage
     public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
         // client side
-        Console.WriteLine("Now I known I'm " + this.To?.Address + ":" + this.To?.Port);
-        if(this.To != null) client.Self = new Pair(false, this.To.Address, this.To.Port);
+        Console.WriteLine("Now I known I'm " + this.To.Address + ":" + this.To.Port);
+        client.Self.Address = this.To.Address;
+        client.Self.Port = this.To.Port;
         return new IMessage[] {};
     }
 

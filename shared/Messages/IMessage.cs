@@ -8,6 +8,7 @@ public enum MessageTypes {
     CharlyRequest = 1,
     CharlyResponse = 2,
     Discover = 3,
+    SyncInit = 4,
 }
 
 public interface IMessage {
@@ -56,12 +57,11 @@ public interface IMessage {
         message.ReplyTo = IMessage.DeserializeIpEndpoint(br);
     }
 
-    public static IMessage Parse(byte[] data) {
+    public static IMessage? Parse(byte[] data) {
         MemoryStream stream = new MemoryStream(data);
         BinaryReader br = new BinaryReader(stream);
 
         MessageTypes type = (MessageTypes)br.ReadInt32();
-        Console.WriteLine(type);
 
         Type cls;
         switch(type) {
@@ -74,8 +74,11 @@ public interface IMessage {
             case MessageTypes.Discover:
                 cls = typeof(MessageDiscover);
                 break;
+            case MessageTypes.SyncInit:
+                cls = typeof(MessageSyncInit);
+                break;
             default:
-                throw new FormatException("Message type does not exists");
+                return null;
         }
 
         IMessage message = (IMessage)Activator.CreateInstance(cls)!;

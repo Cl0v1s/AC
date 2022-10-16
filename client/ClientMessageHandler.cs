@@ -8,7 +8,7 @@ namespace AnimalCrossing.Client;
 public class ClientMessageHandler : IMessageHandler
 {
     public UdpClient Client { get; }
-    public IPEndPoint? Self { get; set; }
+    public IPEndPoint Self { get; set; }
     
     private IPEndPoint Server { get; }
     
@@ -17,11 +17,12 @@ public class ClientMessageHandler : IMessageHandler
     public ClientMessageHandler(IPEndPoint server)
     {
         this.Pairs = new List<IPEndPoint>();
-        this.Self = null;
+        this.Self = new Pair(new AnimalCrossing.Shared.File(Config.Instance.SaveFile), IPAddress.Any, 0);
         this.Client = new UdpClient();
+        this.Client.DontFragment = true;
         this.Server = server;
     }
-
+    
     public void Receive()
     {
         IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
@@ -34,11 +35,16 @@ public class ClientMessageHandler : IMessageHandler
                 this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port);
             if (pair == null)
             {
-                this.Pairs.Add(new Pair(true, sender.Address, sender.Port));
+                this.Pairs.Add(new Pair(this, sender.Address, sender.Port));
             }
         }
 
         IMessage message = IMessage.Parse(data);
+        if (message == null)
+        {
+            Console.WriteLine("Unknown message from "+ sender.Address + ":" + sender.Port);
+            return;
+        }
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
         IMessage[] responses = message.Act(this, sender);
         foreach (IMessage response in responses)

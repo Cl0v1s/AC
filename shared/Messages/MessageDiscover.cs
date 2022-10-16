@@ -5,7 +5,7 @@ namespace AnimalCrossing.Shared;
 public class MessageDiscover : IMessage
 {
     public MessageTypes Type { get; set; }
-    public IPEndPoint? ReplyTo { get; set; }
+    public IPEndPoint ReplyTo { get; set; }
     public IPEndPoint? From { get; set; }
     public IPEndPoint? To { get; set; }
 
@@ -23,10 +23,9 @@ public class MessageDiscover : IMessage
     public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
         // client side
-        Pair pair = new Pair(true, this.ReplyTo!.Address, this.ReplyTo.Port);
-        pair.StartSync(client);
+        Pair pair = new Pair(client, this.ReplyTo.Address, this.ReplyTo.Port);
         client.Pairs.Add(pair);
-        return new IMessage[] {};
+        return new IMessage[] { pair.StartSync(client) };
     }
 
     public void Serialize(BinaryWriter bw)

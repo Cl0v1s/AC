@@ -1,42 +1,66 @@
 using System.Net;
+using System.Net.Sockets;
 
 namespace AnimalCrossing.Shared;
 
 public class Pair : IPEndPoint
 {
-    private bool Remote { get;  }
     
-    private bool Synchronized { get; } = false;
+    public File? File { get; set; }
     
-    public string Hash { get; private set;  }
+    public int MTU { get; set; }
     
-    public DateTime ModifiedAt { get; private set; }
-    
-    public Pair(bool remote, long address, int port) : base(address, port)
+    public Pair(File file, long address, int port) : base(address, port)
     {
-        this.Remote = remote;
-        if(!remote) this.LoadSave();
+        this.File = file;
     }
 
-    public Pair(bool remote, IPAddress address, int port) : base(address, port)
+    public Pair(File file, IPAddress address, int port) : base(address, port)
     {
-        this.Remote = remote;
-        if(!remote) this.LoadSave();
+        this.File = file;
+    }
+    
+    public Pair(IMessageHandler handler, IPAddress address, int port) : base(address, port)
+    {
+        this.File = null;
+        this.FindMTU(handler);
     }
 
-    private void LoadSave()
+    private void FindMTU(IMessageHandler handler)
     {
-        
+        int mtu = 1000;
+        bool found = false;
+        do
+        {
+            byte[] data = new byte[mtu];
+            try
+            {
+                handler.Client.Send(data, mtu, this);
+                found = true;
+                Console.WriteLine("MTU found " + mtu);
+            }
+            catch (SocketException e)
+            {
+                if (e.SocketErrorCode == SocketError.MessageSize)
+                {
+                    found = false;
+                    mtu -= 10;
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        } while (found == false);
+
+        this.MTU = mtu;
+
     }
 
-    public void StartSync(IMessageHandler handler)
+    public IMessage StartSync(IMessageHandler handler)
     {
-        
-    }
-
-    public void HandleSyncInit(IMessageHandler handler, MessageSyncInit message)
-    {
-        this.Hash = message.Hash;
-        this.ModifiedAt = message.ModifiedAt;
+        // client side
+        Pair mySide = (Pair)handler.Self;
+        return new MessageSyncInit(mySide, this, mySide.File!.Hash, mySide.File.ModifiedAt);
     }
 }

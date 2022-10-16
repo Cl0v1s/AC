@@ -7,7 +7,7 @@ public interface IMessageHandler
 {
     UdpClient Client { get;  }
     
-    IPEndPoint? Self { get; set; }
+    IPEndPoint Self { get; set; }
     
     List<IPEndPoint> Pairs { get; set; }
     
