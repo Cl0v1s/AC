@@ -23,7 +23,7 @@ public class ClientMessageHandler : IMessageHandler
         this.Server = new ServerPair(this, server.Address, server.Port);
     }
 
-    private Pair FindPair(IPEndPoint sender)
+    public Pair FindPair(IPEndPoint sender)
     {
         if (sender.Address.ToString() == this.Server.Address.ToString() && sender.Port == this.Server.Port)
         {

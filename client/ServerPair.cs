@@ -27,6 +27,11 @@ public class ServerPair : Pair
             handler.Self.Address = message.To.Address;
             handler.Self.Port = message.To.Port;
             Console.WriteLine("This client is " + handler.Self.Address + ":" + handler.Self.Port);
+        } else if (message is MessageDiscover)
+        {
+            ClientPair clientPair = new ClientPair(handler, message.ReplyTo!.Address, message.ReplyTo.Port);
+            handler.Pairs.Add(clientPair);
+            Console.WriteLine("This client discovered " + clientPair.Address + ":" + clientPair.Port);
         }
 
         return new IMessage[] { };
