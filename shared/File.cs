@@ -8,8 +8,6 @@ public class File
     public string Hash { get; set; }
     public DateTime ModifiedAt { get; set; }
     public byte[]? Content { get; set; }
-    
-    public byte[][]? Temp { get; set; }
 
     public File(string path)
     {
@@ -31,14 +29,4 @@ public class File
         int size = Math.Min(this.Content!.Length, mtu);
         return this.Content!.Chunk(size).ToArray();
     }
-
-    public bool Transfer(int index, byte[] content, int length)
-    {
-        this.Temp ??= new byte[length][];
-        if (this.Temp[index] == null) this.Temp[index] = content;
-
-        return this.Temp.Where(x => x == null).ToArray().Length == 0;
-
-    }
-    
 }
