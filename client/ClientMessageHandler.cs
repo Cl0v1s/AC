@@ -61,7 +61,6 @@ public class ClientMessageHandler : IMessageHandler
         // manage receipt validation
         if (this._receipts.ContainsKey(sender))
         {
-            Console.WriteLine("Clearing " + sender.Address);
             this._receipts[sender].Cancel();
             this._receipts.Remove(sender);
         }

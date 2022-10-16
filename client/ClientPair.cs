@@ -93,15 +93,11 @@ public class ClientPair : Pair
             }
         }
         
-        Console.WriteLine("All parts are here");
-
         this.File.Content = new byte[this.SyncParts!.Length * this.Mtu];
         for (int i = 0; i < this.SyncParts.Length; i++)
         {
             this.SyncParts[i].CopyTo(this.File.Content, i * this.Mtu);
         }
-
-        Console.WriteLine(System.Text.Encoding.ASCII.GetString(this.File.Content));
 
         this.SyncParts = null;
         this.Syncing = false;
@@ -151,7 +147,11 @@ public class ClientPair : Pair
             this.SyncParts ??= new byte[response.Length][];
             this.SyncParts[response.Index] = response.Content;
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if(this.SyncParts.Any(x => x == null) == false) this._cancellationTokenSource.Cancel();
+            if (this.SyncParts.Any(x => x == null) == false)
+            {
+                this.File!.Save(Config.Instance.SaveFile);
+                this._cancellationTokenSource.Cancel();
+            }
         }
     }
 }
