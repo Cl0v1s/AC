@@ -15,8 +15,6 @@ namespace AnimalCrossing.Client
             IPEndPoint server = new IPEndPoint(IPAddress.Parse(Config.Instance.ServerAddress), Config.Instance.ServerPort);
             ClientMessageHandler clientMessageHandler = new ClientMessageHandler(server);
             
-            clientMessageHandler.Send(new MessageCharlyRequest(server, "bonjour"));
-                
             while (true)
             {
                 clientMessageHandler.Receive();

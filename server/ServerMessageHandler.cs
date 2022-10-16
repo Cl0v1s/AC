@@ -17,13 +17,22 @@ public class ServerMessageHandler : IMessageHandler
         this.Client = client;
         this.Self = self;
     }
+    
+    private ClientPair FindPair(IPEndPoint sender)
+    {
+        ClientPair? pair =
+            this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port) as ClientPair;
+        if (pair == null)
+        {
+            pair = new ClientPair(this, sender.Address, sender.Port);
+            this.Pairs.Add(pair);
+        }
+        return pair;
+    }
 
     public void Receive(IPEndPoint sender, byte[] data)
     {
-        IPEndPoint? client =
-            this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port);
-        if(client == null) this.Pairs.Add(sender);
-        
+        ClientPair client = this.FindPair(sender);        
         IMessage? message = IMessage.Parse(data);
         if (message == null)
         {
@@ -31,7 +40,7 @@ public class ServerMessageHandler : IMessageHandler
             return;
         }
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
-        IMessage[] responses = message.Act(this, sender);
+        IMessage[] responses = client.Handle(this, message);
         foreach (IMessage response in responses)
         {
             this.Send(response);

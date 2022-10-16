@@ -20,13 +20,16 @@ public class MessageDiscover : IMessage
         this.To = to;
     }
 
+    /*
     public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
         // client side
+        Pair thisSide = (Pair)client.Self;
         Pair pair = new Pair(client, this.ReplyTo.Address, this.ReplyTo.Port);
         client.Pairs.Add(pair);
-        return new IMessage[] { pair.StartSync(client) };
+        return new IMessage[] { new MessageSyncCompare(thisSide, pair, thisSide.File!.Hash, thisSide.File.ModifiedAt)};
     }
+    */
 
     public void Serialize(BinaryWriter bw)
     {

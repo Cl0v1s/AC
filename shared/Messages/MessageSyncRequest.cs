@@ -31,6 +31,7 @@ public class MessageSyncRequest : IMessage
         this.PartsToSend = partsToSend;
     }
     
+    /*
     public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
     {
         // requested side
@@ -58,6 +59,7 @@ public class MessageSyncRequest : IMessage
 
         return responses;
     }
+    */
 
     public void Serialize(BinaryWriter bw)
     {

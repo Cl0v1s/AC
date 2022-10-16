@@ -17,10 +17,10 @@ public class ClientMessageHandler : IMessageHandler
     public ClientMessageHandler(IPEndPoint server)
     {
         this.Pairs = new List<IPEndPoint>();
-        this.Self = new Pair(new AnimalCrossing.Shared.File(Config.Instance.SaveFile), IPAddress.Any, 0);
+        this.Self = new ClientPair(this, new AnimalCrossing.Shared.File(Config.Instance.SaveFile), IPAddress.Any, 0);
         this.Client = new UdpClient();
         this.Client.DontFragment = true;
-        this.Server = new Pair(this, server.Address, server.Port);
+        this.Server = new ServerPair(this, server.Address, server.Port);
     }
 
     private Pair FindPair(IPEndPoint sender)
@@ -29,11 +29,11 @@ public class ClientMessageHandler : IMessageHandler
         {
             return this.Server;
         }
-        Pair? pair =
-            this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port) as Pair;
+        ClientPair? pair =
+            this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port) as ClientPair;
         if (pair == null)
         {
-            pair = new Pair(this, sender.Address, sender.Port);
+            pair = new ClientPair(this, sender.Address, sender.Port);
             this.Pairs.Add(pair);
         }
 
@@ -54,11 +54,19 @@ public class ClientMessageHandler : IMessageHandler
             return;
         }
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
+
+        IMessage[] responses = sender.Handle(this, message);
+        foreach (IMessage response in responses)
+        {
+            this.Send(response);
+        }
+        /*
         IMessage[] responses = message.Act(this, sender);
         foreach (IMessage response in responses)
         {
             this.Send(response);
         }
+        */
     }
     
     public void Send(IMessage message)

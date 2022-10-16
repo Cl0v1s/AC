@@ -31,22 +31,15 @@ public class MessageSyncResponse : IMessage
         this.Length = length;
     }
     
+    /*
     public IMessage[] Act(IMessageHandler client, IPEndPoint raw)
     {
-        Pair sender = (Pair)raw;
         // requester side
-        Console.WriteLine("Received part " + (this.Index + 1) + "/" + this.Length);
-
-        if (sender.File!.Content == null)
-        {
-            sender.File.Content = new byte[this.Length * sender.Mtu];
-        }
-        this.Content.CopyTo(sender.File.Content, this.Index * sender.Mtu);
-        Console.WriteLine(System.Text.Encoding.ASCII.GetString(sender.File.Content));
-
-        // new MessageSyncRequest(client.Self, this.From!, sender.MTU, new byte[]{ 3, 4})
+        Pair sender = (Pair)raw;
+        sender.File!.Transfer(this.Index, this.Content, this.Length);
         return new IMessage[] {  };
     }
+    */
 
     public void Serialize(BinaryWriter bw)
     {

@@ -19,8 +19,6 @@ public interface IMessage {
     public IPEndPoint? From { get; set; }
     public IPEndPoint To { get; set; }
 
-    public IMessage[] Act(IMessageHandler client, IPEndPoint sender);
-
     public void Serialize(BinaryWriter bw);
     
     public void Deserialize(BinaryReader bw);
