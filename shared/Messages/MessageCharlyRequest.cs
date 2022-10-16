@@ -18,7 +18,7 @@ public class MessageCharlyRequest : IMessage
         // client side
         this.Type = MessageTypes.CharlyRequest;
         this.ReplyTo = null;
-        this.From = null;
+        this.From = new IPEndPoint(IPAddress.Any, 0);
         this.To = to;
         this.Password = password;
     }

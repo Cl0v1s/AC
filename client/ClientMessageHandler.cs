@@ -22,7 +22,15 @@ public class ClientMessageHandler : IMessageHandler
         this.Pairs = new List<IPEndPoint>();
         this.Self = new ClientPair(this, new AnimalCrossing.Shared.File(Config.Instance.SaveFile), IPAddress.Any, 0);
         this.Client = new UdpClient();
-        this.Client.DontFragment = true;
+        try
+        {
+            this.Client.DontFragment = true;
+        }
+        catch (SocketException e)
+        {
+            Console.WriteLine("Dont Fragment not supported.");
+        }
+
         this.Server = new ServerPair(this, server.Address, server.Port);
     }
 
@@ -53,6 +61,7 @@ public class ClientMessageHandler : IMessageHandler
         // manage receipt validation
         if (this._receipts.ContainsKey(sender))
         {
+            Console.WriteLine("Clearing " + sender.Address);
             this._receipts[sender].Cancel();
             this._receipts.Remove(sender);
         }
@@ -99,7 +108,7 @@ public class ClientMessageHandler : IMessageHandler
         // manage receipt start
         if (!needResponse) return;
         CancellationTokenSource source = new CancellationTokenSource();
-        this._receipts.Add(message.From!, source);
+        this._receipts.Add(message.To, source);
         this.EnsureResponse(message, source.Token);
     }
 
