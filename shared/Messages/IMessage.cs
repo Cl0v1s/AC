@@ -8,7 +8,9 @@ public enum MessageTypes {
     CharlyRequest = 1,
     CharlyResponse = 2,
     Discover = 3,
-    SyncInit = 4,
+    SyncCompare = 4,
+    SyncRequest = 5,
+    SyncResponse = 6,
 }
 
 public interface IMessage {
@@ -74,8 +76,14 @@ public interface IMessage {
             case MessageTypes.Discover:
                 cls = typeof(MessageDiscover);
                 break;
-            case MessageTypes.SyncInit:
-                cls = typeof(MessageSyncInit);
+            case MessageTypes.SyncCompare:
+                cls = typeof(MessageSyncCompare);
+                break;
+            case MessageTypes.SyncRequest:
+                cls = typeof(MessageSyncRequest);
+                break;
+            case MessageTypes.SyncResponse:
+                cls = typeof(MessageSyncResponse);
                 break;
             default:
                 return null;

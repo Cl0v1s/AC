@@ -5,30 +5,34 @@ namespace AnimalCrossing.Shared;
 
 public class Pair : IPEndPoint
 {
-    
     public File? File { get; set; }
     
-    public int MTU { get; set; }
+    public int Mtu { get; set; }
+    
+    public Task Syncing { get; set; }
     
     public Pair(File file, long address, int port) : base(address, port)
     {
         this.File = file;
+        this.Syncing = Task.CompletedTask;
     }
 
     public Pair(File file, IPAddress address, int port) : base(address, port)
     {
         this.File = file;
+        this.Syncing = Task.CompletedTask;
     }
     
     public Pair(IMessageHandler handler, IPAddress address, int port) : base(address, port)
     {
         this.File = null;
-        this.FindMTU(handler);
+        this.Syncing = Task.CompletedTask;
+        this.FindMtu(handler);
     }
 
-    private void FindMTU(IMessageHandler handler)
+    private void FindMtu(IMessageHandler handler)
     {
-        int mtu = 1000;
+        int mtu = 10;
         bool found = false;
         do
         {
@@ -53,14 +57,17 @@ public class Pair : IPEndPoint
             }
         } while (found == false);
 
-        this.MTU = mtu;
+        this.Mtu = mtu;
 
     }
 
-    public IMessage StartSync(IMessageHandler handler)
+    public IMessage[] StartSync(IMessageHandler handler)
     {
         // client side
         Pair mySide = (Pair)handler.Self;
-        return new MessageSyncInit(mySide, this, mySide.File!.Hash, mySide.File.ModifiedAt);
+        
+        
+        // and send first request
+        return new IMessage[] { new MessageSyncRequest(mySide, this, this.Mtu) };
     }
 }

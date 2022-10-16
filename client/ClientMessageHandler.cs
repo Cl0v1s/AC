@@ -10,7 +10,7 @@ public class ClientMessageHandler : IMessageHandler
     public UdpClient Client { get; }
     public IPEndPoint Self { get; set; }
     
-    private IPEndPoint Server { get; }
+    private Pair Server { get; }
     
     public List<IPEndPoint> Pairs { get; set; }
 
@@ -20,26 +20,34 @@ public class ClientMessageHandler : IMessageHandler
         this.Self = new Pair(new AnimalCrossing.Shared.File(Config.Instance.SaveFile), IPAddress.Any, 0);
         this.Client = new UdpClient();
         this.Client.DontFragment = true;
-        this.Server = server;
+        this.Server = new Pair(this, server.Address, server.Port);
+    }
+
+    private Pair FindPair(IPEndPoint sender)
+    {
+        if (sender.Address.ToString() == this.Server.Address.ToString() && sender.Port == this.Server.Port)
+        {
+            return this.Server;
+        }
+        Pair? pair =
+            this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port) as Pair;
+        if (pair == null)
+        {
+            pair = new Pair(this, sender.Address, sender.Port);
+            this.Pairs.Add(pair);
+        }
+
+        return pair;
     }
     
     public void Receive()
     {
-        IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-        byte[] data = this.Client.Receive(ref sender);
+        IPEndPoint raw = new IPEndPoint(IPAddress.Any, 0);
+        byte[] data = this.Client.Receive(ref raw);
 
-        // manage pairs
-        if (sender.Address.ToString() != this.Server.Address.ToString() && sender.Port != this.Server.Port)
-        {
-            IPEndPoint? pair =
-                this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port);
-            if (pair == null)
-            {
-                this.Pairs.Add(new Pair(this, sender.Address, sender.Port));
-            }
-        }
-
-        IMessage message = IMessage.Parse(data);
+        Pair sender = this.FindPair(raw);
+        
+        IMessage? message = IMessage.Parse(data);
         if (message == null)
         {
             Console.WriteLine("Unknown message from "+ sender.Address + ":" + sender.Port);

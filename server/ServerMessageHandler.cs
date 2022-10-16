@@ -24,7 +24,12 @@ public class ServerMessageHandler : IMessageHandler
             this.Pairs.Find(x => x.Address.ToString() == sender.Address.ToString() && x.Port == sender.Port);
         if(client == null) this.Pairs.Add(sender);
         
-        IMessage message = IMessage.Parse(data);
+        IMessage? message = IMessage.Parse(data);
+        if (message == null)
+        {
+            Console.WriteLine("Unknown message from "+ sender.Address + ":" + sender.Port);
+            return;
+        }
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
         IMessage[] responses = message.Act(this, sender);
         foreach (IMessage response in responses)
