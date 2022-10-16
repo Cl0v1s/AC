@@ -23,24 +23,6 @@ public class MessageCharlyRequest : IMessage
         this.Password = password;
     }
 
-    public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
-    {
-        // serverside
-        //TODO: do something with password
-        List<IMessage> responses = new List<IMessage>() { new MessageCharlyResponse(client.Self!, sender) };
-
-        client.Pairs.ForEach((pair) =>
-        {
-            if (pair.Address.ToString() != sender.Address.ToString() || pair.Port != sender.Port)
-            {
-                responses.Add(new MessageDiscover(client.Self!, pair, sender));
-                responses.Add(new MessageDiscover(client.Self!, sender, pair));
-            }
-        });
-
-        return responses.ToArray();
-    }
-
     public void Serialize(BinaryWriter bw)
     {
         IMessage.Serialize(bw, this);

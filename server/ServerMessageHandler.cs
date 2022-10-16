@@ -40,14 +40,11 @@ public class ServerMessageHandler : IMessageHandler
             return;
         }
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
-        IMessage[] responses = client.Handle(this, message);
-        foreach (IMessage response in responses)
-        {
-            this.Send(response);
-        }
+        client.Handle(this, message);
     }
     
-    public void Send(IMessage message)
+    // we dont use needResponse here it's never used
+    public void Send(IMessage message, bool needResponse)
     {
         Console.WriteLine("Sending " + message.Type + " to " + message.To.Address + ":" + message.To.Port);
         MemoryStream stream = new MemoryStream();

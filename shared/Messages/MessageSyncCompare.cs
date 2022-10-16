@@ -26,26 +26,6 @@ public class MessageSyncCompare : IMessage
         this.Hash = hash;
         this.ModifiedAt = modifiedAt;
     }
-    
-    /*
-    public IMessage[] Act(IMessageHandler handler, IPEndPoint raw)
-    {
-        Pair sender = (Pair)raw;
-        // client side dest
-        Console.WriteLine("Other Hash: " + this.Hash + " AT " + this.ModifiedAt);
-        Pair? thisSide = handler.Self as Pair;
-
-        // The two files are the same we stop there
-        if (this.Hash == thisSide!.File!.Hash) return new IMessage[] { };
-        
-        // else we have an older version than peer
-        if (this.ModifiedAt >= thisSide.File.ModifiedAt) sender.StartSync(handler, this.Hash, this.ModifiedAt);
-        
-        // else the other is outdated. None of our business for now
-        
-        return new IMessage[] { };
-    }
-    */
 
     public void Serialize(BinaryWriter bw)
     {

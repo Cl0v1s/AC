@@ -20,15 +20,6 @@ public class MessageCharlyResponse : IMessage
         this.To = to;
 
     }
-    
-    public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
-    {
-        // client side
-        Console.WriteLine("Now I known I'm " + this.To.Address + ":" + this.To.Port);
-        client.Self.Address = this.To.Address;
-        client.Self.Port = this.To.Port;
-        return new IMessage[] {};
-    }
 
     public void Serialize(BinaryWriter bw)
     {

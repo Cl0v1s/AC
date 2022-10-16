@@ -11,5 +11,5 @@ public interface IMessageHandler
     
     List<IPEndPoint> Pairs { get; set; }
     
-    void Send(IMessage message);
+    void Send(IMessage message, bool needResponse);
 }

@@ -8,13 +8,13 @@ namespace AnimalCrossing.Client;
 public class ClientPair : Pair
 {
     public Shared.File? File { get; set; }
-    
-    public int Mtu { get; set; }
 
-    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-    
-    public bool Syncing { get; set; }
-    public byte[][]? SyncParts { get; set; }
+    private int Mtu { get; set; }
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+    private bool Syncing { get; set; }
+    private byte[][]? SyncParts { get; set; }
     
     public ClientPair(IMessageHandler handler, Shared.File file, long address, int port) : base(handler, address, port)
     {
@@ -36,12 +36,12 @@ public class ClientPair : Pair
     private void InitRemote(IMessageHandler handler)
     {
         ClientPair? self = handler.Self as ClientPair;
-        handler.Send(new MessageSyncCompare(self!, this, self!.File!.Hash, self.File.ModifiedAt));
+        handler.Send(new MessageSyncCompare(self!, this, self!.File!.Hash, self.File.ModifiedAt), false);
     }
 
     private void FindMtu(IMessageHandler handler)
     {
-        int mtu = 10;
+        int mtu = 1000;
         bool found = false;
         do
         {
@@ -88,7 +88,8 @@ public class ClientPair : Pair
             }
             if (left.Count > 0)
             {
-                handler.Send(new MessageSyncRequest(handler.Self, this, this.Mtu, left.ToArray()));
+                // needResponse is false since it's handled here
+                handler.Send(new MessageSyncRequest(handler.Self, this, this.Mtu, left.ToArray()), false);
             }
         }
         
@@ -106,7 +107,7 @@ public class ClientPair : Pair
         this.Syncing = false;
     }
 
-    public override IMessage[] Handle(IMessageHandler handler, IMessage message)
+    public override void Handle(IMessageHandler handler, IMessage message)
     {
         ClientPair? self = handler.Self as ClientPair;
         if (message is MessageSyncCompare compare)
@@ -114,10 +115,11 @@ public class ClientPair : Pair
             Console.WriteLine("Hash (us/them): " + self!.File!.Hash + " vs " + compare.Hash);
             Console.WriteLine("ModifiedAt (us/them): " + self.File.ModifiedAt + " vs " + compare.ModifiedAt);
 
-            if (self.File.Hash == compare.Hash || self.File.ModifiedAt > compare.ModifiedAt) return new IMessage[] { };
+            if (self.File.Hash == compare.Hash || self.File.ModifiedAt > compare.ModifiedAt) return;
             
             this.Sync(handler, compare, this._cancellationTokenSource.Token);
-            return new IMessage[] { new MessageSyncRequest(self, this, this.Mtu) };
+            // needResponse is false since it's handled here
+            handler.Send(new MessageSyncRequest(self, this, this.Mtu), false);
         } else if (message is MessageSyncRequest request)
         {
             byte[][] parts = self!.File!.Split(request.MTU);
@@ -139,15 +141,17 @@ public class ClientPair : Pair
                     responses[i] = new MessageSyncResponse(self, this, index, parts[index], parts.Length);
                 }
             }
-            return responses;
+            foreach (var response in responses)
+            {
+                handler.Send(response, false);
+            }
         } else if (message is MessageSyncResponse response)
         {
-            if (this.Syncing == false) return new IMessage[] { };
+            if (this.Syncing == false) return;
             this.SyncParts ??= new byte[response.Length][];
             this.SyncParts[response.Index] = response.Content;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if(this.SyncParts.Any(x => x == null) == false) this._cancellationTokenSource.Cancel();
         }
-        
-        return new IMessage[] { };
     }
 }

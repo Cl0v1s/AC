@@ -13,7 +13,7 @@ public class ClientPair : Pair
     {
     }
 
-    public override IMessage[] Handle(IMessageHandler handler, IMessage message)
+    public override void Handle(IMessageHandler handler, IMessage message)
     {
         List<IMessage> responses = new List<IMessage>() { new MessageCharlyResponse(handler.Self, this) };
 
@@ -25,6 +25,9 @@ public class ClientPair : Pair
         }
 
 
-        return responses.ToArray();
+        foreach (var response in responses)
+        {
+            handler.Send(response, false);
+        }
     }
 }

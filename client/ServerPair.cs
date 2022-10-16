@@ -17,10 +17,10 @@ public class ServerPair : Pair
 
     private void Init(IMessageHandler handler)
     { 
-        handler.Send(new MessageCharlyRequest(this, "bonjour"));   
+        handler.Send(new MessageCharlyRequest(this, "bonjour"), true);   
     }
 
-    public override IMessage[] Handle(IMessageHandler handler, IMessage message)
+    public override void Handle(IMessageHandler handler, IMessage message)
     {
         if (message is MessageCharlyResponse)
         {
@@ -33,7 +33,5 @@ public class ServerPair : Pair
             handler.Pairs.Add(clientPair);
             Console.WriteLine("This client discovered " + clientPair.Address + ":" + clientPair.Port);
         }
-
-        return new IMessage[] { };
     }
 }

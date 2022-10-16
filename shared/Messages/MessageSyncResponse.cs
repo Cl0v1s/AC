@@ -30,16 +30,6 @@ public class MessageSyncResponse : IMessage
         this.Content = content;
         this.Length = length;
     }
-    
-    /*
-    public IMessage[] Act(IMessageHandler client, IPEndPoint raw)
-    {
-        // requester side
-        Pair sender = (Pair)raw;
-        sender.File!.Transfer(this.Index, this.Content, this.Length);
-        return new IMessage[] {  };
-    }
-    */
 
     public void Serialize(BinaryWriter bw)
     {

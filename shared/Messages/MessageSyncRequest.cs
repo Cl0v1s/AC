@@ -31,35 +31,6 @@ public class MessageSyncRequest : IMessage
         this.PartsToSend = partsToSend;
     }
     
-    /*
-    public IMessage[] Act(IMessageHandler client, IPEndPoint sender)
-    {
-        // requested side
-        Pair thisSide = (Pair)client.Self;
-        byte[][] parts = thisSide.File!.Split(this.MTU);
-
-        IMessage[] responses;
-        if (this.PartsToSend == null)
-        {
-            responses = new IMessage[parts.Length];
-            for (int i = 0; i < parts.Length; i++)
-            {
-                responses[i] = new MessageSyncResponse(thisSide, this.From!, i, parts[i], parts.Length);
-            }
-        }
-        else
-        {
-            responses = new IMessage[this.PartsToSend.Length];
-            for (int i = 0; i < this.PartsToSend.Length; i++)
-            {
-                int index = (int)this.PartsToSend[i];
-                responses[i] = new MessageSyncResponse(thisSide, this.From!, index, parts[index], parts.Length);
-            }
-        }
-
-        return responses;
-    }
-    */
 
     public void Serialize(BinaryWriter bw)
     {

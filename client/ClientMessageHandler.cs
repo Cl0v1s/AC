@@ -14,8 +14,11 @@ public class ClientMessageHandler : IMessageHandler
     
     public List<IPEndPoint> Pairs { get; set; }
 
+    private Dictionary<IPEndPoint, CancellationTokenSource> _receipts;
+
     public ClientMessageHandler(IPEndPoint server)
     {
+        this._receipts = new Dictionary<IPEndPoint, CancellationTokenSource>();
         this.Pairs = new List<IPEndPoint>();
         this.Self = new ClientPair(this, new AnimalCrossing.Shared.File(Config.Instance.SaveFile), IPAddress.Any, 0);
         this.Client = new UdpClient();
@@ -47,6 +50,13 @@ public class ClientMessageHandler : IMessageHandler
 
         Pair sender = this.FindPair(raw);
         
+        // manage receipt validation
+        if (this._receipts.ContainsKey(sender))
+        {
+            this._receipts[sender].Cancel();
+            this._receipts.Remove(sender);
+        }
+        
         IMessage? message = IMessage.Parse(data);
         if (message == null)
         {
@@ -55,21 +65,27 @@ public class ClientMessageHandler : IMessageHandler
         }
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
 
-        IMessage[] responses = sender.Handle(this, message);
-        foreach (IMessage response in responses)
+        sender.Handle(this, message);
+    }
+
+    private async void EnsureResponse(IMessage message, CancellationToken token)
+    {
+        try
         {
-            this.Send(response);
+            while (token.IsCancellationRequested == false)
+            {
+                await Task.Delay(3000, token);
+                // false since we are already ensuring response
+                this.Send(message, false);
+            }
         }
-        /*
-        IMessage[] responses = message.Act(this, sender);
-        foreach (IMessage response in responses)
+        catch (TaskCanceledException e)
         {
-            this.Send(response);
+            
         }
-        */
     }
     
-    public void Send(IMessage message)
+    public void Send(IMessage message, bool needResponse)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter bw = new BinaryWriter(stream);
@@ -79,6 +95,12 @@ public class ClientMessageHandler : IMessageHandler
         this.Client.Send(data, data.Length, message.To);
         bw.Close();
         stream.Close();
+
+        // manage receipt start
+        if (!needResponse) return;
+        CancellationTokenSource source = new CancellationTokenSource();
+        this._receipts.Add(message.From!, source);
+        this.EnsureResponse(message, source.Token);
     }
 
 
