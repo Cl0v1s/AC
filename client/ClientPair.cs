@@ -113,7 +113,7 @@ public class ClientPair : Pair
         this.Syncing = false;
     }
 
-    public override void Handle(IMessageHandler handler, IMessage message)
+    public override void Handle(IMessageHandler handler, Message message)
     {
         ClientPair? self = handler.Self as ClientPair;
         if (message is MessageSyncState compare)
@@ -129,10 +129,10 @@ public class ClientPair : Pair
         } else if (message is MessageSyncRequest request)
         {
             byte[][] parts = self!.File!.Split(request.Mtu);
-            IMessage[] responses;
+            Message[] responses;
             if (request.PartsToSend == null)
             {
-                responses = new IMessage[parts.Length];
+                responses = new Message[parts.Length];
                 for (int i = 0; i < parts.Length; i++)
                 {
                     responses[i] = new MessageSyncResponse(self, this, i, parts[i], parts.Length);
@@ -140,7 +140,7 @@ public class ClientPair : Pair
             }
             else
             {
-                responses = new IMessage[request.PartsToSend.Length];
+                responses = new Message[request.PartsToSend.Length];
                 for (int i = 0; i < request.PartsToSend.Length; i++)
                 {
                     int index = (int)request.PartsToSend[i];

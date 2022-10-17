@@ -27,7 +27,7 @@ public class ServerPair : Pair
     /// </summary>
     /// <param name="handler">handler receiving the message</param>
     /// <param name="message">message received</param>
-    public override void Handle(IMessageHandler handler, IMessage message)
+    public override void Handle(IMessageHandler handler, Message message)
     {
         if (message is MessageIdentity)
         {

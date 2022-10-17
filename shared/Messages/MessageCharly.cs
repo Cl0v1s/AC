@@ -2,33 +2,26 @@ using System.Net;
 
 namespace AnimalCrossing.Shared;
 
-public class MessageCharly : IMessage
+public class MessageCharly : Message
 {
-    public MessageTypes Type { get; set; }
-    public IPEndPoint From { get; set; }
-    public IPEndPoint To { get; set; }
-    
     public string Password { get; set; }
     
     public MessageCharly() {}
-
-    public MessageCharly(IPEndPoint from, IPEndPoint to, string password)
+    
+    public MessageCharly(IPEndPoint from, IPEndPoint to, string password) : base(MessageTypes.Charly, from, to)
     {
-        this.Type = MessageTypes.Charly;
-        this.From = from;
-        this.To = to;
         this.Password = password;
     }
     
-    public void Serialize(BinaryWriter bw)
+    public override void Serialize(BinaryWriter bw)
     {
-        IMessage.Serialize(bw, this);
+        base.Serialize(bw);
         bw.Write(this.Password);
     }
 
-    public void Deserialize(BinaryReader bw)
+    public override void Deserialize(BinaryReader br)
     {
-        IMessage.Deserialize(bw, this);
-        this.Password = bw.ReadString();
+        base.Deserialize(br);
+        this.Password = br.ReadString();
     }
 }

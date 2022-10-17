@@ -50,7 +50,7 @@ public class ServerMessageHandler : IMessageHandler
     public void Receive(IPEndPoint sender, byte[] data)
     {
         ClientPair client = this.FindPair(sender);        
-        IMessage? message = IMessage.Parse(data);
+        Message? message = Message.Parse(data);
         if (message == null)
         {
             Console.WriteLine("Unknown message from "+ sender.Address + ":" + sender.Port);
@@ -61,7 +61,7 @@ public class ServerMessageHandler : IMessageHandler
     }
     
     // we dont use needResponse here it's never used
-    public void Send(IMessage message, bool needResponse)
+    public void Send(Message message, bool needResponse)
     {
         Console.WriteLine("Sending " + message.Type + " to " + message.To.Address + ":" + message.To.Port);
         MemoryStream stream = new MemoryStream();

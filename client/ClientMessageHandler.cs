@@ -96,7 +96,7 @@ public class ClientMessageHandler : IMessageHandler
             this._receipts.Remove(sender);
         }
         
-        IMessage? message = IMessage.Parse(data);
+        Message? message = Message.Parse(data);
         if (message == null)
         {
             Console.WriteLine("Unknown message from "+ sender.Address + ":" + sender.Port);
@@ -122,7 +122,7 @@ public class ClientMessageHandler : IMessageHandler
     /// </summary>
     /// <param name="message">Message to resend</param>
     /// <param name="token">Cancellation token</param>
-    private async void EnsureResponse(IMessage message, CancellationToken token)
+    private async void EnsureResponse(Message message, CancellationToken token)
     {
         try
         {
@@ -144,7 +144,7 @@ public class ClientMessageHandler : IMessageHandler
     /// </summary>
     /// <param name="message">message to send</param>
     /// <param name="needResponse">true if we need to wit for a receipt from the receiver of the message</param>
-    public void Send(IMessage message, bool needResponse)
+    public void Send(Message message, bool needResponse)
     {
         MemoryStream stream = new MemoryStream();
         BinaryWriter bw = new BinaryWriter(stream);

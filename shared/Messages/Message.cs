@@ -8,20 +8,39 @@ public enum MessageTypes {
     Charly,
     Identity,
     Discover,
-    SyncCompare,
+    SyncState,
     SyncRequest,
     SyncResponse,
     Bye,
 }
 
-public interface IMessage {
+public abstract class Message {
     public MessageTypes Type { get; set; }
     public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
-
-    public void Serialize(BinaryWriter bw);
     
-    public void Deserialize(BinaryReader bw);
+    public Message() {}
+
+    public Message(MessageTypes type, IPEndPoint from, IPEndPoint to)
+    {
+        this.Type = type;
+        this.From = from;
+        this.To = to;
+    }
+
+    public virtual void Serialize(BinaryWriter bw)
+    {
+        bw.Write((int)this.Type);
+        Message.SerializeIpEndpoint(bw, this.From);
+        Message.SerializeIpEndpoint(bw, this.To);  
+    }
+
+    public virtual void Deserialize(BinaryReader br)
+    {
+        // this.type is already parse
+        this.From = Message.DeserializeIpEndpoint(br)!;
+        this.To = Message.DeserializeIpEndpoint(br)!;
+    }
 
     protected static void SerializeIpEndpoint(BinaryWriter bw, IPEndPoint? endpoint)
     {
@@ -31,7 +50,7 @@ public interface IMessage {
         bw.Write(endpoint?.Port ?? 0);
     }
 
-    protected static IPEndPoint? DeserializeIpEndpoint(BinaryReader br)
+    protected static IPEndPoint DeserializeIpEndpoint(BinaryReader br)
     {
         int len = br.ReadInt32();
         byte[] address = br.ReadBytes(len);
@@ -40,22 +59,7 @@ public interface IMessage {
         return new IPEndPoint(new IPAddress(address), port);
     }
 
-    public static void Serialize(BinaryWriter bw, IMessage message)
-    {
-        bw.Write((int)message.Type);
-        IMessage.SerializeIpEndpoint(bw, message.From);
-        IMessage.SerializeIpEndpoint(bw, message.To);
-
-    }
-
-    public static void Deserialize(BinaryReader br, IMessage message)
-    {
-        // this.type is already parse
-        message.From = IMessage.DeserializeIpEndpoint(br)!;
-        message.To = IMessage.DeserializeIpEndpoint(br)!;
-    }
-
-    public static IMessage? Parse(byte[] data) {
+    public static Message? Parse(byte[] data) {
         MemoryStream stream = new MemoryStream(data);
         BinaryReader br = new BinaryReader(stream);
 
@@ -72,7 +76,7 @@ public interface IMessage {
             case MessageTypes.Discover:
                 cls = typeof(MessageDiscover);
                 break;
-            case MessageTypes.SyncCompare:
+            case MessageTypes.SyncState:
                 cls = typeof(MessageSyncState);
                 break;
             case MessageTypes.SyncRequest:
@@ -88,7 +92,7 @@ public interface IMessage {
                 return null;
         }
 
-        IMessage message = (IMessage)Activator.CreateInstance(cls)!;
+        Message message = (Message)Activator.CreateInstance(cls)!;
         message.Type = type;
         message.Deserialize(br);
         

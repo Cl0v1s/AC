@@ -15,12 +15,12 @@ public class ClientPair : Pair
     {
     }
 
-    public override void Handle(IMessageHandler handler, IMessage message)
+    public override void Handle(IMessageHandler handler, Message message)
     {
         if (message is MessageCharly charly)
         {
             this.Password = charly.Password;
-            List<IMessage> responses = new List<IMessage>() { new MessageIdentity(handler.Self, this) };
+            List<Message> responses = new List<Message>() { new MessageIdentity(handler.Self, this) };
 
             foreach (IPEndPoint raw in handler.Pairs)
             {

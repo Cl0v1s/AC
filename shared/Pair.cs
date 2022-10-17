@@ -12,5 +12,5 @@ public abstract class Pair : IPEndPoint
     {
     }
     
-    public abstract void Handle(IMessageHandler handler, IMessage message);
+    public abstract void Handle(IMessageHandler handler, Message message);
 }

@@ -4,12 +4,8 @@ using System.Text;
 
 namespace AnimalCrossing.Shared;
 
-public class MessageSyncResponse : IMessage
+public class MessageSyncResponse : Message
 {
-    public MessageTypes Type { get; set; }
-    public IPEndPoint From { get; set; }
-    public IPEndPoint To { get; set; }
-    
     public int Index { get; set; }
     
     public byte[] Content { get; set; }
@@ -17,31 +13,26 @@ public class MessageSyncResponse : IMessage
     public int Length { get; set; }
     
     public MessageSyncResponse() {}
-
-    public MessageSyncResponse(IPEndPoint from, IPEndPoint to, int index, byte[] content, int length)
+    
+    public MessageSyncResponse(IPEndPoint from, IPEndPoint to, int index, byte[] content, int length): base(MessageTypes.SyncResponse, from, to)
     {
-        this.Type = MessageTypes.SyncResponse;
-        // requested side
-        this.From = from;
-        this.To = to;
-
         this.Index = index;
         this.Content = content;
         this.Length = length;
     }
 
-    public void Serialize(BinaryWriter bw)
+    public override void Serialize(BinaryWriter bw)
     {
-        IMessage.Serialize(bw, this);
+        base.Serialize(bw);
         bw.Write(this.Index);
         bw.Write(this.Content.Length);
         bw.Write(this.Content);
         bw.Write(this.Length);
     }
 
-    public void Deserialize(BinaryReader br)
+    public override void Deserialize(BinaryReader br)
     {
-        IMessage.Deserialize(br, this);
+        base.Deserialize(br);
         this.Index = br.ReadInt32();
         int len = br.ReadInt32();
         this.Content = br.ReadBytes(len);
