@@ -5,6 +5,8 @@ namespace AnimalCrossing.Server;
 
 public class ClientPair : Pair
 {
+    private string Password { get; set; }
+    
     public ClientPair(IMessageHandler handler, long address, int port) : base(handler, address, port)
     {
     }
@@ -15,13 +17,15 @@ public class ClientPair : Pair
 
     public override void Handle(IMessageHandler handler, IMessage message)
     {
-        if (message is MessageCharly)
+        if (message is MessageCharly charly)
         {
+            this.Password = charly.Password;
             List<IMessage> responses = new List<IMessage>() { new MessageIdentity(handler.Self, this) };
 
-            foreach (IPEndPoint pair in handler.Pairs)
+            foreach (IPEndPoint raw in handler.Pairs)
             {
-                if (pair.Address.ToString() == this.Address.ToString() && pair.Port == this.Port) continue;
+                ClientPair pair = (raw as ClientPair)!;
+                if (pair.Address.ToString() == this.Address.ToString() && pair.Port == this.Port || pair.Password != this.Password ) continue;
                 responses.Add(new MessageDiscover(handler.Self, this, pair));
                 responses.Add(new MessageDiscover(handler.Self, pair, this));
             }
