@@ -30,13 +30,12 @@ public class ClientPair : Pair
     {
         this.File = null;
         this.FindMtu(handler);
-        this.InitRemote(handler);
     }
 
-    private void InitRemote(IMessageHandler handler)
+    public void UpdateState(IMessageHandler handler)
     {
         ClientPair? self = handler.Self as ClientPair;
-        handler.Send(new MessageSyncCompare(self!, this, self!.File!.Hash, self.File.ModifiedAt), false);
+        handler.Send(new MessageSyncState(self!, this, Config.Instance.Password, self!.File!.Hash, self.File.ModifiedAt, false), false);
     }
 
     private void FindMtu(IMessageHandler handler)
@@ -70,9 +69,9 @@ public class ClientPair : Pair
 
     }
 
-    private async void Sync(IMessageHandler handler, MessageSyncCompare compare, CancellationToken token)
+    private async void Sync(IMessageHandler handler, MessageSyncState state, CancellationToken token)
     {
-        this.File = new Shared.File(compare.Hash, compare.ModifiedAt);
+        this.File = new Shared.File(state.Hash, state.ModifiedAt);
         this.Syncing = true;
         while (token.IsCancellationRequested == false)
         {
@@ -117,7 +116,7 @@ public class ClientPair : Pair
     public override void Handle(IMessageHandler handler, IMessage message)
     {
         ClientPair? self = handler.Self as ClientPair;
-        if (message is MessageSyncCompare compare)
+        if (message is MessageSyncState compare)
         {
             Console.WriteLine("Hash (us/them): " + self!.File!.Hash + " vs " + compare.Hash);
             Console.WriteLine("ModifiedAt (us/them): " + self.File.ModifiedAt + " vs " + compare.ModifiedAt);

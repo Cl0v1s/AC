@@ -7,7 +7,7 @@ namespace AnimalCrossing.Server;
 public class ServerMessageHandler : IMessageHandler
 {
     public UdpClient Client { get; }
-    public IPEndPoint? Self { get; set; }
+    public IPEndPoint Self { get; set; }
     
     public List<IPEndPoint> Pairs { get; set; }
 
@@ -16,6 +16,23 @@ public class ServerMessageHandler : IMessageHandler
         this.Pairs = new List<IPEndPoint>();
         this.Client = client;
         this.Self = self;
+        
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler (this.OnProcessExit);
+        Console.CancelKeyPress += this.OnProcessExit;
+    }
+    
+    /// <summary>
+    /// Send a bye message to server before quitting
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="args"></param>
+    private void OnProcessExit(object? obj, EventArgs args)
+    {
+        Console.WriteLine("Quitting....");
+        this.Pairs.ForEach((pair) =>
+        {
+            this.Send(new MessageBye(this.Self, pair), false);
+        });
     }
     
     private ClientPair FindPair(IPEndPoint sender)

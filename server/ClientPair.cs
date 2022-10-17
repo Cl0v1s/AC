@@ -15,9 +15,9 @@ public class ClientPair : Pair
 
     public override void Handle(IMessageHandler handler, IMessage message)
     {
-        if (message is MessageCharlyRequest)
+        if (message is MessageSyncState)
         {
-            List<IMessage> responses = new List<IMessage>() { new MessageCharlyResponse(handler.Self, this) };
+            List<IMessage> responses = new List<IMessage>() { new MessageIdentity(handler.Self, this) };
 
             foreach (IPEndPoint pair in handler.Pairs)
             {
@@ -25,7 +25,6 @@ public class ClientPair : Pair
                 responses.Add(new MessageDiscover(handler.Self, this, pair));
                 responses.Add(new MessageDiscover(handler.Self, pair, this));
             }
-
 
             foreach (var response in responses)
             {

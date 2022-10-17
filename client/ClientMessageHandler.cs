@@ -38,6 +38,8 @@ public class ClientMessageHandler : IMessageHandler
         
         AppDomain.CurrentDomain.ProcessExit += new EventHandler (this.OnProcessExit);
         Console.CancelKeyPress += this.OnProcessExit;
+        
+        this.UpdateState();
     }
 
     /// <summary>
@@ -103,6 +105,16 @@ public class ClientMessageHandler : IMessageHandler
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
 
         sender.Handle(this, message);
+    }
+
+    private async void UpdateState()
+    {
+        while (true)
+        {
+            (this.Server as ServerPair)!.UpdateState(this);
+            this.Pairs.ForEach((pair) => (pair as ClientPair)!.UpdateState(this));
+            await Task.Delay(5000);
+        }
     }
 
     /// <summary>

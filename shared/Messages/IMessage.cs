@@ -5,13 +5,12 @@ using System.Runtime;
 namespace AnimalCrossing.Shared;
 
 public enum MessageTypes {
-    CharlyRequest = 1,
-    CharlyResponse = 2,
-    Discover = 3,
-    SyncCompare = 4,
-    SyncRequest = 5,
-    SyncResponse = 6,
-    Bye = 7,
+    Identity,
+    Discover,
+    SyncCompare,
+    SyncRequest,
+    SyncResponse,
+    Bye,
 }
 
 public interface IMessage {
@@ -66,17 +65,14 @@ public interface IMessage {
 
         Type cls;
         switch(type) {
-            case MessageTypes.CharlyRequest:
-                cls = typeof(MessageCharlyRequest);
-                break;
-            case MessageTypes.CharlyResponse:
-                cls = typeof(MessageCharlyResponse);
+            case MessageTypes.Identity:
+                cls = typeof(MessageIdentity);
                 break;
             case MessageTypes.Discover:
                 cls = typeof(MessageDiscover);
                 break;
             case MessageTypes.SyncCompare:
-                cls = typeof(MessageSyncCompare);
+                cls = typeof(MessageSyncState);
                 break;
             case MessageTypes.SyncRequest:
                 cls = typeof(MessageSyncRequest);
