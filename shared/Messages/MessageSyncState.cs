@@ -11,7 +11,6 @@ public class MessageSyncState : IMessage
     public IPEndPoint? From { get; set; }
     public IPEndPoint To { get; set; }
     
-    public string Password { get; set; }
     public string Hash { get; set; }
     public DateTime ModifiedAt { get; set; }
     public bool Playing { get; set; }
@@ -19,13 +18,12 @@ public class MessageSyncState : IMessage
     
     public MessageSyncState() {}
 
-    public MessageSyncState(IPEndPoint from, IPEndPoint to, string password, string hash, DateTime modifiedAt, bool playing)
+    public MessageSyncState(IPEndPoint from, IPEndPoint to, string hash, DateTime modifiedAt, bool playing)
     {
         this.Type = MessageTypes.SyncCompare;
         // client side init
         this.From = from;
         this.To = to;
-        this.Password = password;
         this.Hash = hash;
         this.ModifiedAt = modifiedAt;
         this.Playing = playing;
@@ -34,7 +32,6 @@ public class MessageSyncState : IMessage
     public void Serialize(BinaryWriter bw)
     {
         IMessage.Serialize(bw, this);
-        bw.Write(this.Password);
         bw.Write(this.Hash);
         bw.Write((this.ModifiedAt - MessageSyncState.Epoch).TotalSeconds);
         bw.Write(this.Playing);
@@ -43,7 +40,6 @@ public class MessageSyncState : IMessage
     public void Deserialize(BinaryReader br)
     {
         IMessage.Deserialize(br, this);
-        this.Password = br.ReadString();
         this.Hash = br.ReadString();
         this.ModifiedAt = Epoch.AddSeconds(br.ReadDouble());
         this.Playing = br.ReadBoolean();

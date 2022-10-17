@@ -5,6 +5,7 @@ using System.Runtime;
 namespace AnimalCrossing.Shared;
 
 public enum MessageTypes {
+    Charly,
     Identity,
     Discover,
     SyncCompare,
@@ -65,6 +66,9 @@ public interface IMessage {
 
         Type cls;
         switch(type) {
+            case MessageTypes.Charly:
+                cls = typeof(MessageCharly);
+                break;
             case MessageTypes.Identity:
                 cls = typeof(MessageIdentity);
                 break;

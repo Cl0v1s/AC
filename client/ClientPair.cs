@@ -35,7 +35,7 @@ public class ClientPair : Pair
     public void UpdateState(IMessageHandler handler)
     {
         ClientPair? self = handler.Self as ClientPair;
-        handler.Send(new MessageSyncState(self!, this, Config.Instance.Password, self!.File!.Hash, self.File.ModifiedAt, false), false);
+        handler.Send(new MessageSyncState(self!, this, self!.File!.Hash, self.File.ModifiedAt, false), false);
     }
 
     private void FindMtu(IMessageHandler handler)

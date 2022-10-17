@@ -19,7 +19,7 @@ public class ServerPair : Pair
     public void UpdateState(IMessageHandler handler)
     { 
         ClientPair? self = handler.Self as ClientPair;
-        handler.Send(new MessageSyncState(self!, this, Config.Instance.Password, self!.File!.Hash, self.File.ModifiedAt, false), false);
+        handler.Send(new MessageCharly(self!, this, Config.Instance.Password), false);
     }
 
     /// <summary>

@@ -15,7 +15,7 @@ public class ClientPair : Pair
 
     public override void Handle(IMessageHandler handler, IMessage message)
     {
-        if (message is MessageSyncState)
+        if (message is MessageCharly)
         {
             List<IMessage> responses = new List<IMessage>() { new MessageIdentity(handler.Self, this) };
 
