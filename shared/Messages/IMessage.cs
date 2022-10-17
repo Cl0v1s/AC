@@ -16,15 +16,14 @@ public enum MessageTypes {
 
 public interface IMessage {
     public MessageTypes Type { get; set; }
-    public IPEndPoint? ReplyTo { get; set; }
-    public IPEndPoint? From { get; set; }
+    public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
 
     public void Serialize(BinaryWriter bw);
     
     public void Deserialize(BinaryReader bw);
 
-    private static void SerializeIpEndpoint(BinaryWriter bw, IPEndPoint? endpoint)
+    protected static void SerializeIpEndpoint(BinaryWriter bw, IPEndPoint? endpoint)
     {
         byte[] address = endpoint?.Address.GetAddressBytes() ?? new byte[]{};
         bw.Write(address.Length);
@@ -32,7 +31,7 @@ public interface IMessage {
         bw.Write(endpoint?.Port ?? 0);
     }
 
-    private static IPEndPoint? DeserializeIpEndpoint(BinaryReader br)
+    protected static IPEndPoint? DeserializeIpEndpoint(BinaryReader br)
     {
         int len = br.ReadInt32();
         byte[] address = br.ReadBytes(len);
@@ -46,16 +45,14 @@ public interface IMessage {
         bw.Write((int)message.Type);
         IMessage.SerializeIpEndpoint(bw, message.From);
         IMessage.SerializeIpEndpoint(bw, message.To);
-        IMessage.SerializeIpEndpoint(bw, message.ReplyTo);
 
     }
 
     public static void Deserialize(BinaryReader br, IMessage message)
     {
         // this.type is already parse
-        message.From = IMessage.DeserializeIpEndpoint(br);
+        message.From = IMessage.DeserializeIpEndpoint(br)!;
         message.To = IMessage.DeserializeIpEndpoint(br)!;
-        message.ReplyTo = IMessage.DeserializeIpEndpoint(br);
     }
 
     public static IMessage? Parse(byte[] data) {

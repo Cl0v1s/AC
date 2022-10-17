@@ -7,12 +7,11 @@ public class MessageSyncState : IMessage
     private static readonly DateTime Epoch = new DateTime (1970, 01, 01);
     
     public MessageTypes Type { get; set; }
-    public IPEndPoint? ReplyTo { get; set; }
-    public IPEndPoint? From { get; set; }
+    public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
     
-    public string Hash { get; set; }
-    public DateTime ModifiedAt { get; set; }
+    public string Hash { get; private set; }
+    public DateTime ModifiedAt { get; private set; }
     public bool Playing { get; set; }
     
     

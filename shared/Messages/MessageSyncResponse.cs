@@ -7,8 +7,7 @@ namespace AnimalCrossing.Shared;
 public class MessageSyncResponse : IMessage
 {
     public MessageTypes Type { get; set; }
-    public IPEndPoint? ReplyTo { get; set; }
-    public IPEndPoint? From { get; set; }
+    public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
     
     public int Index { get; set; }

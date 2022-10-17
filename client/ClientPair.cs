@@ -128,7 +128,7 @@ public class ClientPair : Pair
             handler.Send(new MessageSyncRequest(self, this, this.Mtu), false);
         } else if (message is MessageSyncRequest request)
         {
-            byte[][] parts = self!.File!.Split(request.MTU);
+            byte[][] parts = self!.File!.Split(request.Mtu);
             IMessage[] responses;
             if (request.PartsToSend == null)
             {

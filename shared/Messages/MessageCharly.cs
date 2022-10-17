@@ -5,8 +5,7 @@ namespace AnimalCrossing.Shared;
 public class MessageCharly : IMessage
 {
     public MessageTypes Type { get; set; }
-    public IPEndPoint? ReplyTo { get; set; }
-    public IPEndPoint? From { get; set; }
+    public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
     
     public string Password { get; set; }

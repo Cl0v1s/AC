@@ -5,8 +5,7 @@ namespace AnimalCrossing.Shared;
 public class MessageIdentity : IMessage
 {
     public MessageTypes Type { get; set; }
-    public IPEndPoint? ReplyTo { get; set; }
-    public IPEndPoint? From { get; set; }
+    public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
 
     public MessageIdentity() {}
@@ -15,7 +14,6 @@ public class MessageIdentity : IMessage
     {
         // server side
         this.Type = MessageTypes.Identity;
-        this.ReplyTo = null;
         this.From = from;
         this.To = to;
 

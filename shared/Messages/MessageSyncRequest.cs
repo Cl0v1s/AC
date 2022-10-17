@@ -5,11 +5,10 @@ namespace AnimalCrossing.Shared;
 public class MessageSyncRequest : IMessage
 {
     public MessageTypes Type { get; set; }
-    public IPEndPoint? ReplyTo { get; set; }
-    public IPEndPoint? From { get; set; }
+    public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
     
-    public int MTU { get; set; }
+    public int Mtu { get; private set; }
     
     public byte[]? PartsToSend { get; set; }
     
@@ -22,7 +21,7 @@ public class MessageSyncRequest : IMessage
         this.From = from;
         this.To = to;
 
-        this.MTU = mtu;
+        this.Mtu = mtu;
     }
 
     public MessageSyncRequest(IPEndPoint from, IPEndPoint to, int mtu, byte[] partsToSend) : this(from, to, mtu)
@@ -35,7 +34,7 @@ public class MessageSyncRequest : IMessage
     public void Serialize(BinaryWriter bw)
     {
         IMessage.Serialize(bw, this);
-        bw.Write(this.MTU);
+        bw.Write(this.Mtu);
         bw.Write(this.PartsToSend?.Length ?? 0);
         bw.Write(this.PartsToSend ?? new byte[]{});
     }
@@ -43,7 +42,7 @@ public class MessageSyncRequest : IMessage
     public void Deserialize(BinaryReader br)
     {
         IMessage.Deserialize(br, this);
-        this.MTU = br.ReadInt32();
+        this.Mtu = br.ReadInt32();
         int len = br.ReadInt32();
         this.PartsToSend = len == 0 ? null : br.ReadBytes(len);
     }

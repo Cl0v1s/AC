@@ -34,15 +34,10 @@ public class ServerPair : Pair
             handler.Self.Address = message.To.Address;
             handler.Self.Port = message.To.Port;
             Console.WriteLine("This client is " + handler.Self.Address + ":" + handler.Self.Port);
-        } else if (message is MessageDiscover)
+        } else if (message is MessageDiscover discover)
         {
-            Pair? clientPair = (handler as ClientMessageHandler)!.FindPair(message.ReplyTo!);
-            if (clientPair == null)
-            {
-                clientPair = new ClientPair(handler, message.ReplyTo!.Address, message.ReplyTo.Port);
-                handler.Pairs.Add(clientPair);
-                Console.WriteLine("This client discovered " + clientPair.Address + ":" + clientPair.Port);
-            }
+            Pair clientPair = (handler as ClientMessageHandler)!.FindPair(discover.ReplyTo);
+            Console.WriteLine("This client discovered " + clientPair.Address + ":" + clientPair.Port);
         } else if (message is MessageBye)
         {
             Console.WriteLine("Server disconnected.");

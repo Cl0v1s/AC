@@ -6,8 +6,8 @@ public class MessageDiscover : IMessage
 {
     public MessageTypes Type { get; set; }
     public IPEndPoint ReplyTo { get; set; }
-    public IPEndPoint? From { get; set; }
-    public IPEndPoint? To { get; set; }
+    public IPEndPoint From { get; set; }
+    public IPEndPoint To { get; set; }
 
     public MessageDiscover() {}
 
@@ -23,10 +23,12 @@ public class MessageDiscover : IMessage
     public void Serialize(BinaryWriter bw)
     {
         IMessage.Serialize(bw, this);
+        IMessage.SerializeIpEndpoint(bw, this.ReplyTo);
     }
 
     public void Deserialize(BinaryReader bw)
     {
         IMessage.Deserialize(bw, this);
+        this.ReplyTo = IMessage.DeserializeIpEndpoint(bw);
     }
 }
