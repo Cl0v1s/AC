@@ -15,19 +15,26 @@ public class ClientPair : Pair
 
     public override void Handle(IMessageHandler handler, IMessage message)
     {
-        List<IMessage> responses = new List<IMessage>() { new MessageCharlyResponse(handler.Self, this) };
-
-        foreach (IPEndPoint pair in handler.Pairs)
+        if (message is MessageCharlyRequest)
         {
-            if(pair.Address.ToString() == this.Address.ToString() && pair.Port == this.Port) continue;
-            responses.Add(new MessageDiscover(handler.Self, this, pair));
-            responses.Add(new MessageDiscover(handler.Self, pair, this));
-        }
+            List<IMessage> responses = new List<IMessage>() { new MessageCharlyResponse(handler.Self, this) };
+
+            foreach (IPEndPoint pair in handler.Pairs)
+            {
+                if (pair.Address.ToString() == this.Address.ToString() && pair.Port == this.Port) continue;
+                responses.Add(new MessageDiscover(handler.Self, this, pair));
+                responses.Add(new MessageDiscover(handler.Self, pair, this));
+            }
 
 
-        foreach (var response in responses)
+            foreach (var response in responses)
+            {
+                handler.Send(response, false);
+            }
+        } else if (message is MessageBye)
         {
-            handler.Send(response, false);
+            handler.Pairs.Remove(this);
+            Console.WriteLine(this.Address +":"+this.Port+" disconnected");
         }
     }
 }

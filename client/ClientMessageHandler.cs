@@ -5,6 +5,9 @@ using AnimalCrossing.Shared;
 using System.Net.NetworkInformation;
 namespace AnimalCrossing.Client;
 
+/// <summary>
+/// Manage incoming and outgoing data
+/// </summary>
 public class ClientMessageHandler : IMessageHandler
 {
     public UdpClient Client { get; }
@@ -14,7 +17,7 @@ public class ClientMessageHandler : IMessageHandler
     
     public List<IPEndPoint> Pairs { get; set; }
 
-    private Dictionary<IPEndPoint, CancellationTokenSource> _receipts;
+    private readonly Dictionary<IPEndPoint, CancellationTokenSource> _receipts;
 
     public ClientMessageHandler(IPEndPoint server)
     {
@@ -32,8 +35,31 @@ public class ClientMessageHandler : IMessageHandler
         }
 
         this.Server = new ServerPair(this, server.Address, server.Port);
+        
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler (this.OnProcessExit);
+        Console.CancelKeyPress += this.OnProcessExit;
     }
 
+    /// <summary>
+    /// Send a bye message to server before quitting
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="args"></param>
+    private void OnProcessExit(object? obj, EventArgs args)
+    {
+        Console.WriteLine("Quitting....");
+        this.Send(new MessageBye(this.Self, this.Server), false);
+        this.Pairs.ForEach((pair) =>
+        {
+            this.Send(new MessageBye(this.Self, pair), false);
+        });
+    }
+
+    /// <summary>
+    /// Find the pair for a given endpoint
+    /// </summary>
+    /// <param name="sender">endpoint to search a pair for</param>
+    /// <returns></returns>
     public Pair FindPair(IPEndPoint sender)
     {
         if (sender.Address.ToString() == this.Server.Address.ToString() && sender.Port == this.Server.Port)
@@ -51,6 +77,9 @@ public class ClientMessageHandler : IMessageHandler
         return pair;
     }
     
+    /// <summary>
+    /// Watch for new data
+    /// </summary>
     public void Receive()
     {
         IPEndPoint raw = new IPEndPoint(IPAddress.Any, 0);
@@ -76,6 +105,11 @@ public class ClientMessageHandler : IMessageHandler
         sender.Handle(this, message);
     }
 
+    /// <summary>
+    /// Ressend a message every 3s if we dont get any response
+    /// </summary>
+    /// <param name="message">Message to resend</param>
+    /// <param name="token">Cancellation token</param>
     private async void EnsureResponse(IMessage message, CancellationToken token)
     {
         try
@@ -93,6 +127,11 @@ public class ClientMessageHandler : IMessageHandler
         }
     }
     
+    /// <summary>
+    /// Send a message 
+    /// </summary>
+    /// <param name="message">message to send</param>
+    /// <param name="needResponse">true if we need to wit for a receipt from the receiver of the message</param>
     public void Send(IMessage message, bool needResponse)
     {
         MemoryStream stream = new MemoryStream();

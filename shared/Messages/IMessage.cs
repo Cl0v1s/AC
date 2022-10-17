@@ -11,6 +11,7 @@ public enum MessageTypes {
     SyncCompare = 4,
     SyncRequest = 5,
     SyncResponse = 6,
+    Bye = 7,
 }
 
 public interface IMessage {
@@ -82,6 +83,9 @@ public interface IMessage {
                 break;
             case MessageTypes.SyncResponse:
                 cls = typeof(MessageSyncResponse);
+                break;
+            case MessageTypes.Bye:
+                cls = typeof(MessageBye);
                 break;
             default:
                 return null;

@@ -162,6 +162,10 @@ public class ClientPair : Pair
             {
                 this._cancellationTokenSource.Cancel();
             }
+        } else if (message is MessageBye)
+        {
+            handler.Pairs.Remove(this);
+            Console.WriteLine(this.Address +":"+this.Port+" disconnected");
         }
     }
 }
