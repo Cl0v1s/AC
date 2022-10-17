@@ -92,13 +92,24 @@ public class ClientPair : Pair
                 handler.Send(new MessageSyncRequest(handler.Self, this, this.Mtu, left.ToArray()), false);
             }
         }
-        
-        this.File.Content = new byte[this.SyncParts!.Length * this.Mtu];
+
+        byte[] content = new byte[this.SyncParts!.Length * this.Mtu];
         for (int i = 0; i < this.SyncParts.Length; i++)
         {
-            this.SyncParts[i].CopyTo(this.File.Content, i * this.Mtu);
+            this.SyncParts[i].CopyTo(content, i * this.Mtu);
         }
 
+        int u = content.Length - 1;
+        while (content[u] == '\0')
+        {
+            u--;
+        }
+        Array.Resize(ref content, u + 1);
+        this.File.Content = content;
+        
+        this.File!.Save(Config.Instance.SaveFile);
+
+        
         this.SyncParts = null;
         this.Syncing = false;
     }
@@ -149,7 +160,6 @@ public class ClientPair : Pair
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (this.SyncParts.Any(x => x == null) == false)
             {
-                this.File!.Save(Config.Instance.SaveFile);
                 this._cancellationTokenSource.Cancel();
             }
         }

@@ -7,7 +7,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9e2e04ac-70a8-4bfb-9471-c55b8c3dba9d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/ClientMessageHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/ClientMessageHandler.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/ClientPair.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/ClientPair.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/test_new.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/test_new.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/test_old.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/test_old.json" afterDir="false" />
@@ -87,7 +86,8 @@
       <option name="presentableId" value="Default" />
       <updated>1665766493885</updated>
       <workItem from="1665766503018" duration="23317000" />
-      <workItem from="1665951931598" duration="4791000" />
+      <workItem from="1665951931598" duration="5490000" />
+      <workItem from="1666025013031" duration="908000" />
     </task>
     <servers />
   </component>
@@ -109,5 +109,24 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/shared/File.cs</url>
+          <line>33</line>
+          <properties documentPath="$PROJECT_DIR$/shared/File.cs" initialLine="33" containingFunctionPresentation="method 'Save'">
+            <startOffsets>
+              <option value="848" />
+            </startOffsets>
+            <endOffsets>
+              <option value="849" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

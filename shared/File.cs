@@ -35,8 +35,6 @@ public class File
         string fileName = Path.GetFileNameWithoutExtension(path) + "-" + DateTime.Now.ToString("dd-MM-yyy-hh-mm-ss") + Path.GetExtension(path);
         string newPath = Path.Combine(Path.GetDirectoryName(path)!, fileName);
         System.IO.File.Copy(path, newPath);
-        System.IO.File.Delete(path);
-        FileStream fs = System.IO.File.Create(path, this.Content!.Length);
-        fs.Write(this.Content, 0, this.Content.Length);
+        System.IO.File.WriteAllBytes(path, this.Content!);
     }
 }
