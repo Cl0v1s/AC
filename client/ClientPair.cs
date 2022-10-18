@@ -35,7 +35,7 @@ public class ClientPair : Pair
     public void NotifyLocalStateToThisPair(IMessageHandler handler)
     {
         ClientPair? self = handler.Self as ClientPair;
-        handler.Send(new MessageSyncState(self!, this, self!.File!.Hash, self.File.ModifiedAt, false), false);
+        handler.Send(new MessageSyncState(self!, this, self!.File!.Hash, self.File.ModifiedAt, false), true);
     }
 
     private void FindMtu(IMessageHandler handler)
@@ -125,16 +125,27 @@ public class ClientPair : Pair
         this.File!.Save(Config.Instance.SaveFile);
     }
 
+    /// <summary>
+    /// Handle messages. Remember than "this" here refers to the peer endpoint and "self" to this client
+    /// </summary>
+    /// <param name="handler">Message handler</param>
+    /// <param name="message">Message to handle</param>
     public override void Handle(IMessageHandler handler, Message message)
     {
         ClientPair? self = handler.Self as ClientPair;
+        
+        // use class
         if (message is MessageSyncState compare)
         {
             Console.WriteLine("Hash (us/them): " + self!.File!.Hash + " vs " + compare.Hash);
             Console.WriteLine("ModifiedAt (us/them): " + self.File.ModifiedAt + " vs " + compare.ModifiedAt);
 
-            // if our file is newer or the hash is the same or we are already syncing, do nothing
-            if (this.Syncing || self.File.Hash == compare.Hash || self.File.ModifiedAt > compare.ModifiedAt) return;
+            // if our file is newer or the hash is the same or we are already syncing, do nothing but ack
+            if (this.Syncing || self.File.Hash == compare.Hash || self.File.ModifiedAt > compare.ModifiedAt)
+            {
+                handler.Send(new Message(MessageTypes.Ok, self, this), false);
+                return;
+            };
             this._cancellationTokenSource = new CancellationTokenSource();
             this.Sync(handler, compare, this._cancellationTokenSource.Token);
             // needResponse is false since it's handled here

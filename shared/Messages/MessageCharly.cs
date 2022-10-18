@@ -19,7 +19,7 @@ public class MessageCharly : Message
         bw.Write(this.Password);
     }
 
-    public override void Deserialize(BinaryReader br)
+    protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
         this.Password = br.ReadString();

@@ -28,7 +28,7 @@ public class MessageSyncRequest : Message
         bw.Write(this.PartsToSend ?? new byte[]{});
     }
 
-    public override void Deserialize(BinaryReader br)
+    protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
         this.Mtu = br.ReadInt32();

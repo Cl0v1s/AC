@@ -12,9 +12,10 @@ public enum MessageTypes {
     SyncRequest,
     SyncResponse,
     Bye,
+    Ok,
 }
 
-public abstract class Message {
+public class Message {
     public MessageTypes Type { get; set; }
     public IPEndPoint From { get; set; }
     public IPEndPoint To { get; set; }
@@ -35,7 +36,7 @@ public abstract class Message {
         Message.SerializeIpEndpoint(bw, this.To);  
     }
 
-    public virtual void Deserialize(BinaryReader br)
+    protected virtual void Deserialize(BinaryReader br)
     {
         // this.type is already parse
         this.From = Message.DeserializeIpEndpoint(br)!;
@@ -89,7 +90,8 @@ public abstract class Message {
                 cls = typeof(MessageBye);
                 break;
             default:
-                return null;
+                cls = typeof(Message);
+                break;
         }
 
         Message message = (Message)Activator.CreateInstance(cls)!;

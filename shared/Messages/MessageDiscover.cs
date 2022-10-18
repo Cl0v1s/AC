@@ -19,7 +19,7 @@ public class MessageDiscover : Message
         Message.SerializeIpEndpoint(bw, this.ReplyTo);
     }
 
-    public override void Deserialize(BinaryReader br)
+    protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
         this.ReplyTo = Message.DeserializeIpEndpoint(br);

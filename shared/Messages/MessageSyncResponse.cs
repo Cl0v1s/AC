@@ -30,7 +30,7 @@ public class MessageSyncResponse : Message
         bw.Write(this.Length);
     }
 
-    public override void Deserialize(BinaryReader br)
+    protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
         this.Index = br.ReadInt32();

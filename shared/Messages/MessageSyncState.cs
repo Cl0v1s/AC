@@ -27,7 +27,7 @@ public class MessageSyncState : Message
         bw.Write(this.Playing);
     }
 
-    public override void Deserialize(BinaryReader br)
+    protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
         this.Hash = br.ReadString();
