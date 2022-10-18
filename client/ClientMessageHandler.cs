@@ -38,8 +38,6 @@ public class ClientMessageHandler : IMessageHandler
         
         AppDomain.CurrentDomain.ProcessExit += new EventHandler (this.OnProcessExit);
         Console.CancelKeyPress += this.OnProcessExit;
-        
-        this.UpdateState();
     }
 
     /// <summary>
@@ -55,6 +53,27 @@ public class ClientMessageHandler : IMessageHandler
         {
             this.Send(new MessageBye(this.Self, pair), false);
         });
+    }
+
+    /// <summary>
+    /// Handle when local file change so we have to tell our pairs
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="args"></param>
+    public void OnLocalFileChange(object obj, FileChangedEventArgs args)
+    {
+        ClientPair self = (this.Self as ClientPair)!;
+        self.File = args.File;
+        this.UpdatePairs();
+    }
+
+    private void UpdatePairs()
+    {
+        foreach (var pair in this.Pairs)
+        {
+            ClientPair clientPair = (pair as ClientPair)!;
+            clientPair.NotifyLocalStateToThisPair(this);
+        }
     }
 
     /// <summary>
@@ -105,16 +124,6 @@ public class ClientMessageHandler : IMessageHandler
         Console.WriteLine("Incoming " + message.Type + " from " + sender.Address + ":" + sender.Port);
 
         sender.Handle(this, message);
-    }
-
-    private async void UpdateState()
-    {
-        while (true)
-        {
-            (this.Server as ServerPair)!.UpdateState(this);
-            this.Pairs.ForEach((pair) => (pair as ClientPair)!.UpdateState(this));
-            await Task.Delay(5000);
-        }
     }
 
     /// <summary>

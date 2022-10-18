@@ -10,10 +10,12 @@ public class ServerPair : Pair
 {
     public ServerPair(IMessageHandler handler, long address, int port) : base(handler, address, port)
     {
+        this.UpdateState(handler);
     }
 
     public ServerPair(IMessageHandler handler, IPAddress address, int port) : base(handler, address, port)
     {
+        this.UpdateState(handler);
     }
     
     public void UpdateState(IMessageHandler handler)

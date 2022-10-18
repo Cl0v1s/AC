@@ -5,6 +5,12 @@ namespace AnimalCrossing.Shared;
 
 public class File
 {
+    public static string CalculateHash(byte[] content)
+    {
+        SHA256 sha = SHA256.Create();
+        return System.Text.Encoding.ASCII.GetString((sha.ComputeHash(content)));
+    }
+    
     public string Hash { get; set; }
     public DateTime ModifiedAt { get; set; }
     public byte[]? Content { get; set; }
@@ -13,8 +19,7 @@ public class File
     {
         this.Content = System.IO.File.ReadAllBytes(path);
 
-        SHA256 sha = SHA256.Create();
-        this.Hash = System.Text.Encoding.ASCII.GetString((sha.ComputeHash(this.Content)));
+        this.Hash = File.CalculateHash(this.Content);
         this.ModifiedAt = System.IO.File.GetLastWriteTime(path);
     }
 

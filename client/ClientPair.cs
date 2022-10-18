@@ -11,7 +11,7 @@ public class ClientPair : Pair
 
     private int Mtu { get; set; }
 
-    private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+    private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
     private bool Syncing { get; set; }
     private byte[][]? SyncParts { get; set; }
@@ -32,7 +32,7 @@ public class ClientPair : Pair
         this.FindMtu(handler);
     }
 
-    public void UpdateState(IMessageHandler handler)
+    public void NotifyLocalStateToThisPair(IMessageHandler handler)
     {
         ClientPair? self = handler.Self as ClientPair;
         handler.Send(new MessageSyncState(self!, this, self!.File!.Hash, self.File.ModifiedAt, false), false);
@@ -68,10 +68,15 @@ public class ClientPair : Pair
         this.Mtu = mtu;
 
     }
-
+    
+    /// <summary>
+    /// Start sync process with a foreign pair
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="state"></param>
+    /// <param name="token"></param>
     private async void Sync(IMessageHandler handler, MessageSyncState state, CancellationToken token)
     {
-        this.File = new Shared.File(state.Hash, state.ModifiedAt);
         this.Syncing = true;
         while (token.IsCancellationRequested == false)
         {
@@ -91,6 +96,7 @@ public class ClientPair : Pair
                 handler.Send(new MessageSyncRequest(handler.Self, this, this.Mtu, left.ToArray()), false);
             }
         }
+        Console.WriteLine(this.SyncParts);
 
         byte[] content = new byte[this.SyncParts!.Length * this.Mtu];
         for (int i = 0; i < this.SyncParts.Length; i++)
@@ -104,13 +110,19 @@ public class ClientPair : Pair
             u--;
         }
         Array.Resize(ref content, u + 1);
-        this.File.Content = content;
-        
-        this.File!.Save(Config.Instance.SaveFile);
-
         
         this.SyncParts = null;
         this.Syncing = false;
+        
+        // something during transfer gone wrong
+        if (Shared.File.CalculateHash(content) != state.Hash)
+        {
+            Console.WriteLine("Error during transfer. Hashs doesnt match.");
+            return;
+        }
+        this.File = new Shared.File(state.Hash, state.ModifiedAt);
+        this.File.Content = content;
+        this.File!.Save(Config.Instance.SaveFile);
     }
 
     public override void Handle(IMessageHandler handler, Message message)
@@ -121,8 +133,9 @@ public class ClientPair : Pair
             Console.WriteLine("Hash (us/them): " + self!.File!.Hash + " vs " + compare.Hash);
             Console.WriteLine("ModifiedAt (us/them): " + self.File.ModifiedAt + " vs " + compare.ModifiedAt);
 
-            if (self.File.Hash == compare.Hash || self.File.ModifiedAt > compare.ModifiedAt) return;
-            
+            // if our file is newer or the hash is the same or we are already syncing, do nothing
+            if (this.Syncing || self.File.Hash == compare.Hash || self.File.ModifiedAt > compare.ModifiedAt) return;
+            this._cancellationTokenSource = new CancellationTokenSource();
             this.Sync(handler, compare, this._cancellationTokenSource.Token);
             // needResponse is false since it's handled here
             handler.Send(new MessageSyncRequest(self, this, this.Mtu), false);
@@ -153,7 +166,6 @@ public class ClientPair : Pair
             }
         } else if (message is MessageSyncResponse response)
         {
-            if (this.Syncing == false) return;
             this.SyncParts ??= new byte[response.Length][];
             this.SyncParts[response.Index] = response.Content;
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
