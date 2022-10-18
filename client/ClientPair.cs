@@ -96,14 +96,15 @@ public class ClientPair : Pair
                 handler.Send(new MessageSyncRequest(handler.Self, this, this.Mtu, left.ToArray()), false);
             }
         }
-        Console.WriteLine(this.SyncParts);
 
+        // place the different parts into the same byte array
         byte[] content = new byte[this.SyncParts!.Length * this.Mtu];
         for (int i = 0; i < this.SyncParts.Length; i++)
         {
             this.SyncParts[i].CopyTo(content, i * this.Mtu);
         }
-
+        // since the resulting byte array length is not exactly correct we have to remove
+        // NULL characters
         int u = content.Length - 1;
         while (content[u] == '\0')
         {
