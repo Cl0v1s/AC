@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Runtime;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AnimalCrossing.Shared;
 
@@ -57,5 +59,12 @@ public class Message {
         message.Deserialize(br);
         
         return message;
+    }
+
+    public static string ComputeHash(byte[] content)
+    {
+        SHA256 s = SHA256.Create();
+        content = s.ComputeHash(content);
+        return Encoding.ASCII.GetString(content);
     }
 }

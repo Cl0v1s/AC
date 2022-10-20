@@ -38,7 +38,7 @@ public class Client
         }
     }
 
-    private void Send(Message message)
+    public void Send(Message message)
     {
         Stream stream = this._client.GetStream();
         BinaryWriter bw = new BinaryWriter(stream);
@@ -60,14 +60,40 @@ public class Client
                     Villages.Add(village);
                 }
                 this._village = village;
+                // if there were only a peer connected before us, we ask them to sync again
+                // TODO: NOT WHAT WE WANT
+                if(this._village.Clients.Count == 1) this._village.Clients[0].Send(new MessagePull());
+                this._village.Clients.Add(this);
             }
             if (state.Hash != this._village.Hash && state.ModifiedAt >= this._village.ModifiedAt)
             {
                 this.Send(new MessagePull());
             }
-        } else if (message is MessagePull pull)
+        } else if (message is MessagePush push)
         {
-            // someone asked to pull the best version 
+            if (this._village == null) return;
+            // someone tried to push their version
+            string hash = Message.ComputeHash(push.Content);
+            if (hash != this._village.Hash && push.ModifiedAt >= this._village.ModifiedAt)
+            {
+                this._village.Hash = hash;
+                this._village.ModifiedAt = push.ModifiedAt;
+                // if we have at least a peer connected, we dont store the save on the server
+                if (this._village.Clients.Count > 1)
+                {
+                    this._village.Newest = this;
+                }
+                else
+                {
+                    this._village.File = push.Content;
+                }
+                // we say to every clients to make a pull 
+                this._village.Clients.ForEach((c) =>
+                {
+                    if (c == this) return;
+                    c.Send(new MessagePull());
+                });
+            }
         }
         
     }

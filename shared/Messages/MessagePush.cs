@@ -2,7 +2,9 @@ namespace AnimalCrossing.Shared;
 
 public class MessagePush : Message
 {
+    private static readonly DateTime Epoch = new DateTime(1970, 1, 1);
     
+    public DateTime ModifiedAt { get; set; }
     public byte[] Content { get; set; }
     
     public MessagePush(byte[] content)
@@ -17,11 +19,13 @@ public class MessagePush : Message
         base.Serialize(bw);
         bw.Write(this.Content.Length);
         bw.Write(this.Content);
+        bw.Write((this.ModifiedAt - Epoch).TotalSeconds);
     }
 
     protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
         this.Content = br.ReadBytes(br.ReadInt32());
+        this.ModifiedAt = Epoch.AddSeconds(br.ReadInt32());
     }
 }

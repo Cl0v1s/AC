@@ -1,3 +1,5 @@
+using AnimalCrossing.Shared;
+
 namespace AnimalCrossing.Server;
 
 public class Village
@@ -8,11 +10,38 @@ public class Village
     public DateTime ModifiedAt { get; set; } = new DateTime(1970, 1, 1);
     public string Hash { get; set; } = "A HOUSE IN A MIDDLE OF A";
 
-    public byte[]? File { get; set; }
-    public Client? Newest { get; set; }
+    private byte[]? _file;
+
+    private Client? _newest;
     
     public Village(string password)
     {
         this.Password = password;
     }
+
+    public byte[]? File
+    {
+        get => this._file;
+
+        set
+        {
+            this._file = value;
+            if (value == null) return;
+            this._newest = null;
+        }
+    }
+
+    public Client? Newest
+    {
+        get => this._newest;
+
+        set
+        {
+            this._newest = value;
+            if (value == null) return;
+            // we free the previous stocked file
+            this._file = null;
+        }
+    }
+
 }
