@@ -23,15 +23,16 @@ public class MessageState: Message
     {
         base.Serialize(bw);
         bw.Write(this.Password);
-        //bw.Write((this.ModifiedAt - Epoch).TotalSeconds);
-        //bw.Write(this.Hash);
+        double diff = (this.ModifiedAt - Epoch).TotalSeconds; 
+        bw.Write(diff);
+        bw.Write(this.Hash);
     }
 
     protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
         this.Password = br.ReadString();
-        //this.ModifiedAt = Epoch.AddSeconds(br.ReadInt32());
-        //this.Hash = br.ReadString();
+        this.ModifiedAt = Epoch.AddSeconds(br.ReadDouble());
+        this.Hash = br.ReadString();
     }
 }

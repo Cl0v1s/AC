@@ -24,7 +24,7 @@ public class Message {
 
     public virtual void Serialize(BinaryWriter bw)
     {
-        bw.Write((int)this.Type);
+        bw.Write((byte)this.Type);
     }
 
     protected virtual void Deserialize(BinaryReader br)
@@ -32,11 +32,11 @@ public class Message {
         // this.type is already parse
     }
 
-    public static Message Parse(byte[] data) {
+    public static Message? Parse(byte[] data) {
         MemoryStream stream = new MemoryStream(data);
         BinaryReader br = new BinaryReader(stream);
 
-        MessageTypes type = (MessageTypes)br.ReadInt32();
+        MessageTypes type = (MessageTypes)br.ReadByte();
 
         Type cls;
         switch(type) {
@@ -50,8 +50,7 @@ public class Message {
                 cls = typeof(MessageState);
                 break;
             default:
-                cls = typeof(Message);
-                break;
+                return null;
         }
 
         Message message = (Message)Activator.CreateInstance(cls)!;

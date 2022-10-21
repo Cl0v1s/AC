@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using AnimalCrossing.Shared;
 
 namespace AnimalCrossing.Client;
@@ -21,28 +22,44 @@ public class Server
     {
         return Task.Run(() =>
         {
-            while (true)
+            Stream stream = this._socket.GetStream();
+            byte[] length = new byte[4];
+            int i = 0;
+            int r;
+            while ((r = stream.ReadByte()) != -1)
             {
-                if(this._socket.Connected == false) continue;
-                Stream stream = this._socket.GetStream();
-                int i;
-                byte[] data = new byte[255];
-                while ((i = stream.Read(data, 0, 255)) != 0)
+                length[i] = (byte)r;
+                i++;
+                if (i < length.Length) continue;
+                byte[] data = new byte[BitConverter.ToInt32(length)];
+                Console.Write("Receiving " + data.Length + " bytes...");
+                i = 0;
+                while (i < data.Length && (r = stream.ReadByte()) != -1)
                 {
-                    Console.WriteLine("Received " + data.Length);
-                    Message msg = Message.Parse(data);
-                    this.Handle(msg);
+                    data[i] = (byte)r;
+                    i++;
                 }
+                i = 0;
+                Console.WriteLine("Done");
+                Message? msg = Message.Parse(data);
+                if(msg == null) continue;
+                this.Handle(msg);
             }
         });
     }
 
     private void Send(Message message)
     {
-        Stream stream = this._socket.GetStream();
-        BinaryWriter bw = new BinaryWriter(stream);
+        MemoryStream memory = new MemoryStream();
+        BinaryWriter bw = new BinaryWriter(memory);
         message.Serialize(bw);
-        bw.Close();
+
+        Stream stream = this._socket.GetStream();
+        byte[] data = memory.ToArray();
+        stream.Write(BitConverter.GetBytes((Int32)data.Length));
+        Console.Write("Sending " + data.Length + " bytes...");
+        stream.Write(data);
+        Console.WriteLine("Done");
     }
 
     private void Handle(Message message)
