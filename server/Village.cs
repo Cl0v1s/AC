@@ -1,8 +1,9 @@
 using AnimalCrossing.Shared;
+using shared;
 
 namespace AnimalCrossing.Server;
 
-public class Village
+public class Village : IVillage
 {
     public string Password { get; set; }
     public List<Client> Clients { get; set; } = new List<Client>();

@@ -15,7 +15,7 @@ public class Server
         this._socket = new TcpClient(Config.Instance.ServerAddress, Config.Instance.ServerPort);
         this._cancellationTokenSource = new CancellationTokenSource();
         
-        this.Send(new MessageState(Config.Instance.Password, DateTime.Now, "TEST"));
+        this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
     }
 
     public Task Start()
@@ -65,5 +65,26 @@ public class Server
     private void Handle(Message message)
     {
         Console.WriteLine("Handled " + message.Type);
+        if (message is MessageState state)
+        {
+            if (state.Hash == Village.Instance.Hash || state.ModifiedAt < Village.Instance.ModifiedAt) return;
+            this.Send(new MessagePull());
+        } else if (message is MessagePull)
+        {
+            this.Send(new MessagePush(Village.Instance.File, Village.Instance.ModifiedAt));
+        } else if (message is MessagePush push)
+        {
+            string hash = Message.ComputeHash(push.Content);
+            if (hash != Village.Instance.Hash && push.ModifiedAt < Village.Instance.ModifiedAt)
+            {
+                // we are newer than received, so we answer with our village
+                this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
+                return;
+            }
+            // else we are out of date so we replace local village
+            Village.Instance.Save(push.Content);
+            
+            Console.WriteLine(Village.Instance.Hash + " -> " + Village.Instance.ModifiedAt);
+        }
     }
 }

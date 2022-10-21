@@ -17,36 +17,38 @@ public class Client
     public Client(TcpClient socket)
     {
         this._socket = socket;
-
         this._cancellationTokenSource = new CancellationTokenSource();
-        this.Receive(this._cancellationTokenSource.Token);
     }
 
-    private async void Receive(CancellationToken token)
+    public Task Receive()
     {
-        Stream stream = this._socket.GetStream();
-        byte[] length = new byte[4];
-        int i = 0;
-        int r;
-        while ((r = stream.ReadByte()) != -1)
+        return Task.Run(() =>
         {
-            length[i] = (byte)r;
-            i++;
-            if (i < length.Length) continue;
-            byte[] data = new byte[BitConverter.ToInt32(length)];
-            Console.Write("Receiving " + data.Length + " bytes...");
-            i = 0;
-            while (i < data.Length && (r = stream.ReadByte()) != -1)
+            CancellationToken token = this._cancellationTokenSource.Token;
+            Stream stream = this._socket.GetStream();
+            byte[] length = new byte[4];
+            int i = 0;
+            int r;
+            while ((r = stream.ReadByte()) != -1)
             {
-                data[i] = (byte)r;
+                length[i] = (byte)r;
                 i++;
+                if (i < length.Length) continue;
+                byte[] data = new byte[BitConverter.ToInt32(length)];
+                Console.Write("Receiving " + data.Length + " bytes...");
+                i = 0;
+                while (i < data.Length && (r = stream.ReadByte()) != -1)
+                {
+                    data[i] = (byte)r;
+                    i++;
+                }
+                i = 0;
+                Console.WriteLine("Done");
+                Message? msg = Message.Parse(data);
+                if(msg == null) continue;
+                this.Handle(msg);
             }
-            i = 0;
-            Console.WriteLine("Done");
-            Message? msg = Message.Parse(data);
-            if(msg == null) continue;
-            this.Handle(msg);
-        }
+        });
     }
 
     private void Send(Message message)
@@ -114,6 +116,8 @@ public class Client
                     this._village.File = push.Content;
                 }
 
+                Console.WriteLine(this._village.Hash + " -> " + this._village.ModifiedAt);
+
                 // we say to every clients to make a pull 
                 this._village.Clients.ForEach((c) =>
                 {
@@ -127,7 +131,7 @@ public class Client
             if (this._village.File != null)
             {
                 // the version is stored in memory
-                this.Send(new MessagePush(this._village.File));
+                this.Send(new MessagePush(this._village.File, this._village.ModifiedAt));
             }
             else if(this._village.Newest != null)
             {

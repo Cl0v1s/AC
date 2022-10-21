@@ -9,10 +9,11 @@ public class MessagePush : Message
     
     public MessagePush() {}
     
-    public MessagePush(byte[] content)
+    public MessagePush(byte[] content, DateTime modifiedAt)
     {
         this.Type = MessageTypes.Push;
-        
+
+        this.ModifiedAt = modifiedAt;
         this.Content = content;
     }
 
@@ -21,13 +22,15 @@ public class MessagePush : Message
         base.Serialize(bw);
         bw.Write(this.Content.Length);
         bw.Write(this.Content);
-        bw.Write((this.ModifiedAt - Epoch).TotalSeconds);
+        double diff = (this.ModifiedAt - Epoch).TotalSeconds;
+        bw.Write(diff);
     }
 
     protected override void Deserialize(BinaryReader br)
     {
         base.Deserialize(br);
-        this.Content = br.ReadBytes(br.ReadInt32());
-        this.ModifiedAt = Epoch.AddSeconds(br.ReadInt32());
+        int length = br.ReadInt32();
+        this.Content = br.ReadBytes(length);
+        this.ModifiedAt = Epoch.AddSeconds(br.ReadDouble());
     }
 }

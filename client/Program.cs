@@ -9,7 +9,7 @@ namespace AnimalCrossing.Client
     {
         static void Main(string[] args)
         {
-            // Config.Instance.SaveFile = args[0];
+            Config.Instance.SaveFile = args[0];
             Server server = new Server();
             server.Start().Wait();
         }

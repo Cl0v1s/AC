@@ -22,6 +22,7 @@ public class Server
         while (true)
         {
             Client client = new Client(listener.AcceptTcpClient());
+            client.Receive();
             _clients.Add(client);
         }
     }
