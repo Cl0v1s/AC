@@ -15,7 +15,7 @@ public enum MessageTypes {
 public class Message {
     public MessageTypes Type { get; set; }
     
-    public Message() {}
+    protected Message() {}
 
     public Message(MessageTypes type)
     {

@@ -10,13 +10,13 @@ public class Client
     private delegate void OnPushReceiveHandler(Client sender, MessagePush push);
 
     private event OnPushReceiveHandler? OnPushReceived;
-    private readonly TcpClient _client;
+    private readonly TcpClient _socket;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private Village? _village;
 
-    public Client(TcpClient client)
+    public Client(TcpClient socket)
     {
-        this._client = client;
+        this._socket = socket;
 
         this._cancellationTokenSource = new CancellationTokenSource();
         this.Receive(this._cancellationTokenSource.Token);
@@ -24,26 +24,20 @@ public class Client
 
     private async void Receive(CancellationToken token)
     {
-        Stream stream = this._client.GetStream();
-        while (true)
+        Stream stream = this._socket.GetStream();
+        int i;
+        byte[] data = new byte[255];
+        while ((i = stream.Read(data, 0, 255)) != 0)
         {
-            if (this._client.Available > 0)
-            {
-                int i;
-                byte[] data = new byte[this._client.Available];
-                while ((i = stream.Read(data)) != 0)
-                {
-                   Message msg = Message.Parse(data); 
-                   this.Handle(msg);
-                }
-            }
-            await Task.Delay(500, token);
+            Console.WriteLine("Received " + data.Length);
+            Message msg = Message.Parse(data);
+            this.Handle(msg);
         }
     }
 
     public void Send(Message message)
     {
-        Stream stream = this._client.GetStream();
+        Stream stream = this._socket.GetStream();
         BinaryWriter bw = new BinaryWriter(stream);
         message.Serialize(bw);
         bw.Close();

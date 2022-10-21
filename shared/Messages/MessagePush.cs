@@ -7,6 +7,8 @@ public class MessagePush : Message
     public DateTime ModifiedAt { get; set; }
     public byte[] Content { get; set; }
     
+    public MessagePush() {}
+    
     public MessagePush(byte[] content)
     {
         this.Type = MessageTypes.Push;
