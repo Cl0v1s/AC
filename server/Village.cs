@@ -11,8 +11,6 @@ public class Village : IVillage
     public DateTime ModifiedAt { get; set; } = new DateTime(1970, 1, 1);
     public string Hash { get; set; } = "A HOUSE IN A MIDDLE OF A";
 
-    private byte[]? _file;
-
     private Client? _newest;
     
     public Village(string password)
@@ -22,12 +20,24 @@ public class Village : IVillage
 
     public byte[]? File
     {
-        get => this._file;
+        get
+        {
+            if (System.IO.File.Exists(this.Password + ".sav"))
+            {
+                return System.IO.File.ReadAllBytes(this.Password + ".sav");
+            }
+
+            return null;
+        }
 
         set
         {
-            this._file = value;
-            if (value == null) return;
+            if (value == null)
+            {
+                System.IO.File.Delete(this.Password + ".sav");
+                return;
+            }
+            System.IO.File.WriteAllBytes(this.Password + ".sav", value);
             this._newest = null;
         }
     }
@@ -41,7 +51,7 @@ public class Village : IVillage
             this._newest = value;
             if (value == null) return;
             // we free the previous stocked file
-            this._file = null;
+            this.File = null;
         }
     }
 
