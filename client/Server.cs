@@ -16,6 +16,15 @@ public class Server
         this._cancellationTokenSource = new CancellationTokenSource();
         
         this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
+
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler(this.OnExit);
+        Console.CancelKeyPress += new ConsoleCancelEventHandler(this.OnExit);
+    }
+
+    private void OnExit(object? obj, EventArgs args)
+    {
+        this._cancellationTokenSource.Cancel();
+        this._socket.Close();
     }
 
     public Task Start()
@@ -26,14 +35,20 @@ public class Server
             byte[] length = new byte[4];
             int i = 0;
             int r;
-            while ((r = stream.ReadByte()) != -1)
+            while (this._cancellationTokenSource.IsCancellationRequested == false && (r = stream.ReadByte()) != -1)
             {
                 length[i] = (byte)r;
                 i++;
                 if (i < length.Length) continue;
                 byte[] data = new byte[BitConverter.ToInt32(length)];
                 Console.Write("Receiving " + data.Length + " bytes...");
+                length = new byte[4];
                 i = 0;
+                if (data.Length == 0)
+                {
+                    Console.WriteLine("Pass");
+                    continue;
+                };
                 while (i < data.Length && (r = stream.ReadByte()) != -1)
                 {
                     data[i] = (byte)r;
@@ -57,12 +72,11 @@ public class Server
         Stream stream = this._socket.GetStream();
         byte[] data = memory.ToArray();
         stream.Write(BitConverter.GetBytes((Int32)data.Length));
-        Console.Write("Sending " + data.Length + " bytes...");
         stream.Write(data);
-        Console.WriteLine("Done");
+        Console.WriteLine("Sent " + message.Type);
     }
 
-    private void Handle(Message message)
+    private async void Handle(Message message)
     {
         Console.WriteLine("Handled " + message.Type);
         if (message is MessageState state)
@@ -71,7 +85,8 @@ public class Server
             this.Send(new MessagePull());
         } else if (message is MessagePull)
         {
-            this.Send(new MessagePush(Village.Instance.File, Village.Instance.ModifiedAt));
+            byte[] content = await Village.Instance.GetContent();
+            this.Send(new MessagePush(content, Village.Instance.ModifiedAt));
         } else if (message is MessagePush push)
         {
             string hash = Message.ComputeHash(push.Content);

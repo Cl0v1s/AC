@@ -13,6 +13,14 @@ public class Server
         
     }
 
+    private async void ManageClient(Client client)
+    {
+        Console.WriteLine("Clients: " + this._clients.Count);
+        await client.Start();
+        this._clients.Remove(client);
+        Console.WriteLine("Clients: "+this._clients.Count);
+    }
+
     public void Start(int port)
     {
         TcpListener listener = new TcpListener(IPAddress.Any, port);
@@ -22,8 +30,8 @@ public class Server
         while (true)
         {
             Client client = new Client(listener.AcceptTcpClient());
-            client.Receive();
-            _clients.Add(client);
+            this._clients.Add(client);
+            this.ManageClient(client);
         }
     }
 }
