@@ -10,8 +10,25 @@ namespace AnimalCrossing.Client
         static void Main(string[] args)
         {
             Config.Instance.SaveFile = args[0];
-            Server server = new Server();
-            server.Start().Wait();
+            Program.Run();
+        }
+
+        static void Run()
+        {
+            while (true)
+            {
+                try
+                {
+                    Server server = new Server();
+                    server.Start().Wait();
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine("Connection Failed... Retrying in 5s");
+                }
+
+                Task.Delay(5000).Wait();
+            }
         }
     }
 }
