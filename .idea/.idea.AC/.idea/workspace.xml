@@ -9,12 +9,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/Server.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Server.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/Village.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Village.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/test_new.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/test_new.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/test_old.json" beforeDir="false" afterPath="$PROJECT_DIR$/client/test_old.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/Client.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/Server.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/Server.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/Village.cs" beforeDir="false" afterPath="$PROJECT_DIR$/server/Village.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/IVillage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/IVillage.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,6 +19,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/db53ae57c8bf4a54b9178b6941e53ac288c00/3d/798f3797/SocketPal.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/db53ae57c8bf4a54b9178b6941e53ac288c00/fb/5f68f52a/TcpClient.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -36,17 +33,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/clovis/Documents/AC/shared/shared.csproj",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "RiderDpaPageId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/clovis/Documents/AC/shared/shared.csproj&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;RiderDpaPageId&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Project.server">
     <configuration name="client" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
@@ -104,6 +101,7 @@
       <workItem from="1666288271346" duration="11792000" />
       <workItem from="1666435793241" duration="8456000" />
       <workItem from="1666522798072" duration="6864000" />
+      <workItem from="1666814267993" duration="2612000" />
     </task>
     <servers />
   </component>

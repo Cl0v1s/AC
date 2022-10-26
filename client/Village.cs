@@ -1,3 +1,4 @@
+
 using AnimalCrossing.Shared;
 using shared;
 
@@ -6,6 +7,12 @@ namespace AnimalCrossing.Client;
 public class Village : IVillage
 {
     public static Village Instance = new Village(Config.Instance.Password);
+
+    public delegate void FileChangeHandler();
+
+    public event FileChangeHandler? FileChanged;
+
+    private FileSystemWatcher _watcher;
     
     public string Password { get; set; }
     public DateTime ModifiedAt { get; set; }
@@ -17,10 +24,30 @@ public class Village : IVillage
 
     private byte[] _content;
 
-    public Village(string password)
+    private Village(string password)
     {
+        this._watcher = new FileSystemWatcher(Path.GetDirectoryName(Config.Instance.SaveFile)!);
+        this._watcher.NotifyFilter = NotifyFilters.LastWrite;
+        this._watcher.Changed += this.FileMayHaveChanged;
+        this._watcher.EnableRaisingEvents = true;
+
         this.Password = password;
         this.Load();
+    }
+
+    private void FileMayHaveChanged(object obj, FileSystemEventArgs args)
+    {
+        if (args.Name != Path.GetFileName(Config.Instance.SaveFile)) return;
+        this._watcher.Changed -= this.FileMayHaveChanged;
+        this.Load();
+        this.FileChanged?.Invoke();
+        this.EnableWatch();
+    }
+
+    private async void EnableWatch()
+    {
+        await Task.Delay(100);
+        this._watcher.Changed += this.FileMayHaveChanged;
     }
 
     private void Load()

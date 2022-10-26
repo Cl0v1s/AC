@@ -90,18 +90,26 @@ public class Village : IVillage
 
     public void AddClient(Client client, string hash, DateTime modifiedAt)
     {
-        client.OnPushReceived += OnPushClientsChanged;
         this.Clients.Add(client);
+        this.Compare(client, hash, modifiedAt);
+        // if we have two or more clients we remove the File
+        if (this.Clients.Count >= 2)
+        {
+            this.File = null;
+        }
+    }
+
+    public void Compare(Client client, string hash, DateTime modifiedAt)
+    {
+        client.OnPushReceived += OnPushClientsChanged;
         if (hash != this.Hash && modifiedAt > this.ModifiedAt)
         {
             client.Send(new MessagePull());
             this._newest = client;
         }
-
-        // if we have two or more clients we remove the File
-        if (this.Clients.Count >= 2)
+        else
         {
-            this.File = null;
+            client.Send(new MessageState(this.Password, this.ModifiedAt, this.Hash));
         }
     }
 

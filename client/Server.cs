@@ -16,15 +16,26 @@ public class Server
         this._cancellationTokenSource = new CancellationTokenSource();
         
         this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
+        Village.Instance.FileChanged += this.OnVillageChanged;
 
         AppDomain.CurrentDomain.ProcessExit += new EventHandler(this.OnExit);
         Console.CancelKeyPress += new ConsoleCancelEventHandler(this.OnExit);
+    }
+
+    ~Server()
+    {
+        Village.Instance.FileChanged -= this.OnVillageChanged;
     }
 
     private void OnExit(object? obj, EventArgs args)
     {
         this._cancellationTokenSource.Cancel();
         this._socket.Close();
+    }
+
+    private void OnVillageChanged()
+    {
+        this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
     }
 
     public Task Start()

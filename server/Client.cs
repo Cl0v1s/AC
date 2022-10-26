@@ -128,7 +128,10 @@ public class Client
                 this._village = village;
                 this._village.AddClient(this, state.Hash, state.ModifiedAt);
             }
-            this.Send(new MessageState(this._village.Password, this._village.ModifiedAt, this._village.Hash));
+            else
+            {
+                this._village.Compare(this, state.Hash, state.ModifiedAt);
+            }
         } else if (message is MessagePush push)
         {
             // we trigger event for eventual listeners
