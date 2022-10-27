@@ -12,20 +12,19 @@ public class Client
 
     public event OnPushReceiveHandler? OnPushReceived;
     private readonly TcpClient _socket;
-    private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly CancellationToken _cancellationToken;
     private Village? _village;
 
-    public Client(TcpClient socket)
+    public Client(TcpClient socket, CancellationToken token)
     {
+        this._cancellationToken = token;
         this._socket = socket;
-        this._cancellationTokenSource = new CancellationTokenSource();
     }
 
     ~Client()
     {
         this._socket.GetStream().Dispose();
         this._socket.Dispose();
-        this._cancellationTokenSource.Dispose();
     }
 
     public async Task Start()
@@ -38,7 +37,7 @@ public class Client
     {
         return Task.Run(() =>
         {
-            while (this._cancellationTokenSource.IsCancellationRequested == false && this._socket.Connected)
+            while (this._cancellationToken.IsCancellationRequested == false && this._socket.Connected)
             {
                 Stream stream = this._socket.GetStream();
                 stream.ReadTimeout = 5000;
@@ -95,7 +94,7 @@ public class Client
                     Debug.WriteLine(e);
                 }
             }
-        });
+        }, _cancellationToken);
     }
 
     public void Send(Message message)

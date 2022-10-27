@@ -7,8 +7,8 @@ namespace AnimalCrossing.Client;
 
 public class Server
 {
-    private TcpClient _socket;
-    private CancellationTokenSource _cancellationTokenSource;
+    private readonly TcpClient _socket;
+    private readonly CancellationTokenSource _cancellationTokenSource;
     
     public Server()
     {
@@ -25,6 +25,11 @@ public class Server
     ~Server()
     {
         Village.Instance.FileChanged -= this.OnVillageChanged;
+    }
+
+    public void Stop()
+    {
+        this.OnExit(null, EventArgs.Empty);
     }
 
     private void OnExit(object? obj, EventArgs args)

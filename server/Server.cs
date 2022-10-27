@@ -6,11 +6,17 @@ namespace AnimalCrossing.Server;
 public class Server
 {
 
-    private List<Client> _clients = new List<Client>();
+    private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+    public readonly List<Client> _clients = new List<Client>();
 
     public Server()
     {
         
+    }
+
+    public void Stop()
+    {
+        this._cancellationTokenSource.Cancel();
     }
 
     private async void ManageClient(Client client)
@@ -27,9 +33,9 @@ public class Server
         listener.Start();
         Console.WriteLine("Server started...");
 
-        while (true)
+        while (this._cancellationTokenSource.IsCancellationRequested == false)
         {
-            Client client = new Client(listener.AcceptTcpClient());
+            Client client = new Client(listener.AcceptTcpClient(), this._cancellationTokenSource.Token);
             this._clients.Add(client);
             this.ManageClient(client);
         }
