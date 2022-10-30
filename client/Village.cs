@@ -1,6 +1,7 @@
-
+using System;
 using AnimalCrossing.Shared;
-using shared;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace AnimalCrossing.Client;
 

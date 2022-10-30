@@ -1,4 +1,4 @@
-namespace shared;
+namespace AnimalCrossing.Shared;
 
 public interface IVillage
 {

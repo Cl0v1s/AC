@@ -1,34 +1,21 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using AnimalCrossing.Shared;
+﻿using Avalonia;
+using System;
 
-
-namespace AnimalCrossing.Client
+namespace client
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            Config.Instance.SaveFile = args[0];
-            Program.Run();
-        }
+        // Initialization code. Don't use any Avalonia, third-party APIs or any
+        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+        // yet and stuff might break.
+        [STAThread]
+        public static void Main(string[] args) => BuildAvaloniaApp()
+            .StartWithClassicDesktopLifetime(args);
 
-        static void Run()
-        {
-            while (true)
-            {
-                try
-                {
-                    Server server = new Server();
-                    server.Start().Wait();
-                }
-                catch (SocketException e)
-                {
-                    Console.WriteLine("Connection Failed... Retrying in 5s");
-                }
-
-                Task.Delay(5000).Wait();
-            }
-        }
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .LogToTrace();
     }
 }

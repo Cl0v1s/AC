@@ -1,5 +1,4 @@
 using AnimalCrossing.Shared;
-using shared;
 
 namespace AnimalCrossing.Server;
 

@@ -15,7 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\client\client.csproj" />
       <ProjectReference Include="..\server\server.csproj" />
       <ProjectReference Include="..\shared\shared.csproj" />
     </ItemGroup>

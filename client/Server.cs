@@ -1,6 +1,8 @@
-using System.Net;
+using System;
 using System.Net.Sockets;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.IO;
 using AnimalCrossing.Shared;
 
 namespace AnimalCrossing.Client;
@@ -115,7 +117,7 @@ public class Server
             // else we are out of date so we replace local village
             Village.Instance.Save(push.Content);
             
-            Console.WriteLine(Village.Instance.Hash + " -> " + Village.Instance.ModifiedAt);
+            Console.WriteLine(Village.Instance.Hash + " -> " + Village.Instance.ModifiedAt + "");
         }
     }
 }
