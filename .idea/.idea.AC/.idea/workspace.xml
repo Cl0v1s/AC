@@ -7,14 +7,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9e2e04ac-70a8-4bfb-9471-c55b8c3dba9d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.AC/.idea/avalonia.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AC/.idea/avalonia.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.AC/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AC.sln" beforeDir="false" afterPath="$PROJECT_DIR$/AC.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/Program.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/App.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/client/App.axaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/App.axaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/App.axaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/AppViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/AppViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Program.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/Server.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Server.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/Village.cs" beforeDir="false" afterPath="$PROJECT_DIR$/client/Village.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Old/Old.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/IVillage.cs" beforeDir="false" afterPath="$PROJECT_DIR$/shared/IVillage.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/client/client.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +24,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/db53ae57c8bf4a54b9178b6941e53ac288c00/3d/798f3797/SocketPal.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/db53ae57c8bf4a54b9178b6941e53ac288c00/fb/5f68f52a/TcpClient.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/client/App.axaml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/client/Village.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -153,7 +155,8 @@
       <workItem from="1666814267993" duration="3358000" />
       <workItem from="1666897212981" duration="4278000" />
       <workItem from="1667131781041" duration="1254000" />
-      <workItem from="1667133067062" duration="1720000" />
+      <workItem from="1667133067062" duration="7075000" />
+      <workItem from="1667218396997" duration="3231000" />
     </task>
     <servers />
   </component>

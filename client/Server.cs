@@ -10,18 +10,16 @@ namespace AnimalCrossing.Client;
 public class Server
 {
     private readonly TcpClient _socket;
-    private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly AppViewModel _context;
     
-    public Server()
+    public Server(AppViewModel context)
     {
+        this._context = context;
         this._socket = new TcpClient(Config.Instance.ServerAddress, Config.Instance.ServerPort);
-        this._cancellationTokenSource = new CancellationTokenSource();
         
         this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
         Village.Instance.FileChanged += this.OnVillageChanged;
 
-        AppDomain.CurrentDomain.ProcessExit += new EventHandler(this.OnExit);
-        Console.CancelKeyPress += new ConsoleCancelEventHandler(this.OnExit);
     }
 
     ~Server()
@@ -29,23 +27,12 @@ public class Server
         Village.Instance.FileChanged -= this.OnVillageChanged;
     }
 
-    public void Stop()
-    {
-        this.OnExit(null, EventArgs.Empty);
-    }
-
-    private void OnExit(object? obj, EventArgs args)
-    {
-        this._cancellationTokenSource.Cancel();
-        this._socket.Close();
-    }
-
     private void OnVillageChanged()
     {
         this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
     }
 
-    public Task Start()
+    public Task Start(CancellationToken token)
     {
         return Task.Run(() =>
         {
@@ -53,7 +40,7 @@ public class Server
             byte[] length = new byte[4];
             int i = 0;
             int r;
-            while (this._cancellationTokenSource.IsCancellationRequested == false && (r = stream.ReadByte()) != -1)
+            while (token.IsCancellationRequested == false && (r = stream.ReadByte()) != -1)
             {
                 length[i] = (byte)r;
                 i++;
@@ -78,7 +65,7 @@ public class Server
                 if(msg == null) continue;
                 this.Handle(msg);
             }
-        });
+        }, token);
     }
 
     private void Send(Message message)
@@ -100,6 +87,8 @@ public class Server
         if (message is MessageState state)
         {
             if (state.Hash == Village.Instance.Hash || state.ModifiedAt < Village.Instance.ModifiedAt) return;
+            // we are out of date
+            this._context.State = "<Syncing...>";
             this.Send(new MessagePull());
         } else if (message is MessagePull)
         {
@@ -107,6 +96,8 @@ public class Server
             this.Send(new MessagePush(content, Village.Instance.ModifiedAt));
         } else if (message is MessagePush push)
         {
+            // received a version
+            this._context.State = "<Connected...>";
             string hash = Message.ComputeHash(push.Content);
             if (hash != Village.Instance.Hash && push.ModifiedAt < Village.Instance.ModifiedAt)
             {

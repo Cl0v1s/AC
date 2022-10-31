@@ -5,6 +5,7 @@
       <map>
         <entry key="AvaloniaApplication1/App.axaml" value="AvaloniaApplication1/AvaloniaApplication1.csproj" />
         <entry key="AvaloniaApplication1/MainWindow.axaml" value="AvaloniaApplication1/AvaloniaApplication1.csproj" />
+        <entry key="client/App.axaml" value="client/client.csproj" />
         <entry key="client/MainWindow.axaml" value="client/client.csproj" />
       </map>
     </option>

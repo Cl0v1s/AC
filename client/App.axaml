@@ -1,7 +1,19 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="client.App">
+             x:Class="AnimalCrossing.Client.App">
     <Application.Styles>
         <FluentTheme Mode="Light"/>
     </Application.Styles>
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="{Binding Path=Icon}" ToolTipText="Animal Syncing">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="{Binding State}"  />
+                        <NativeMenuItem Header="Exit" Command="{Binding Exit}" />
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
 </Application>
