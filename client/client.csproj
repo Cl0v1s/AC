@@ -11,6 +11,12 @@
     </PropertyGroup>
     <ItemGroup>
         <None Remove=".gitignore" />
+        <None Update="resources\connected.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="resources\disconnected.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
     <ItemGroup>
         <!--This helps with theme dll-s trimming.
@@ -29,9 +35,7 @@
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.3.4" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\ACSE.Core\ACSE.Core.csproj" />
       <ProjectReference Include="..\shared\shared.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <AvaloniaResource Include="resources\**" />
     </ItemGroup>
 </Project>

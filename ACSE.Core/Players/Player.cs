@@ -151,8 +151,10 @@ namespace ACSE.Core.Players
             if (Offsets.Patterns > -1)
             {
                 Data.Patterns = new Pattern[Offsets.PatternCount];
+                /*
                 for (var i = 0; i < Data.Patterns.Length; i++)
                     Data.Patterns[i] = new Pattern(offset + Offsets.Patterns + Offsets.PatternSize * i, i);
+                */
             }
 
             if (Save.SaveInstance.SaveType == SaveType.CityFolk)

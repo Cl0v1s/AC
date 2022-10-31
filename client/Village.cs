@@ -2,6 +2,10 @@ using System;
 using AnimalCrossing.Shared;
 using System.IO;
 using System.Threading.Tasks;
+using ACSE.Core;
+using ACSE.Core.Housing;
+using ACSE.Core.Players;
+using ACSE.Core.Saves;
 
 namespace AnimalCrossing.Client;
 
@@ -56,6 +60,10 @@ public class Village : IVillage
         this.ModifiedAt = System.IO.File.GetLastWriteTime(Config.Instance.SaveFile);
         this._content = System.IO.File.ReadAllBytes(Config.Instance.SaveFile);
         this.Hash = Message.ComputeHash(this._content);
+
+        Save save = new Save(Config.Instance.SaveFile);
+        House[] houses = HouseInfo.LoadHouses(save);
+        Player p = new Player(save.SaveDataStartOffset + save.SaveInfo.SaveOffsets.PlayerStart, 0);
     }
 
     public void Save(byte[] content)
