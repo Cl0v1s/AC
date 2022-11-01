@@ -10,6 +10,7 @@ public enum MessageTypes {
     State,
     Pull,
     Push,
+    Playing,
 }
 
 public class Message {

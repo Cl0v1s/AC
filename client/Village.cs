@@ -11,12 +11,10 @@ namespace AnimalCrossing.Client;
 
 public class Village : IVillage
 {
-    public static Village Instance = new Village(Config.Instance.Password);
+    public static readonly Village Instance = new Village(Config.Instance.Password);
 
     public delegate void FileChangeHandler();
-
     public event FileChangeHandler? FileChanged;
-
     private FileSystemWatcher _watcher;
     
     public string Password { get; set; }
@@ -24,14 +22,17 @@ public class Village : IVillage
     public string Hash { get; set; }
     public Task<byte[]> GetContent()
     {
-        return Task.Run(() => this._content) ;
+        return Task.Run(() => this._content!) ;
     }
 
-    private byte[] _content;
+    private byte[]? _content;
+
+    private House[]? _houses;
+    private Player[]? _players;
 
     private Village(string password)
     {
-        this._watcher = new FileSystemWatcher(Path.GetDirectoryName(Config.Instance.SaveFile)!);
+        this._watcher = new FileSystemWatcher(Path.GetDirectoryName(Path.GetFullPath(Config.Instance.SaveFile))!);
         this._watcher.NotifyFilter = NotifyFilters.LastWrite;
         this._watcher.Changed += this.FileMayHaveChanged;
         this._watcher.EnableRaisingEvents = true;
@@ -62,8 +63,13 @@ public class Village : IVillage
         this.Hash = Message.ComputeHash(this._content);
 
         Save save = new Save(Config.Instance.SaveFile);
-        House[] houses = HouseInfo.LoadHouses(save);
-        Player p = new Player(save.SaveDataStartOffset + save.SaveInfo.SaveOffsets.PlayerStart, 0);
+        
+        this._houses = HouseInfo.LoadHouses(save);
+        this._players = new Player[4];
+        for (int i = 0; i < 4; i++)
+        {
+            this._players[i] = new Player(save.SaveDataStartOffset + save.SaveInfo.SaveOffsets.PlayerStart + i * save.SaveInfo.SaveOffsets.PlayerSize, i);
+        }
     }
 
     public void Save(byte[] content)

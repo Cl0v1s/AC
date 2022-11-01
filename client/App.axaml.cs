@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Markup.Xaml;
 
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net.Sockets;

@@ -29,12 +29,10 @@ public class AppViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref this._state, value);
     }
 
-    private readonly CancellationTokenSource _tokenSource;
     private readonly IClassicDesktopStyleApplicationLifetime _lifetime;
     
     public AppViewModel(IClassicDesktopStyleApplicationLifetime lifetime, CancellationTokenSource tokenSource)
     {
-        this._tokenSource = tokenSource;
         this._lifetime = lifetime;
     }
 

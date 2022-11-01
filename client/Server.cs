@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 using AnimalCrossing.Shared;
 
 namespace AnimalCrossing.Client;
@@ -19,7 +21,7 @@ public class Server
         
         this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
         Village.Instance.FileChanged += this.OnVillageChanged;
-
+        
     }
 
     ~Server()
@@ -32,7 +34,36 @@ public class Server
         this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
     }
 
+    private Task CheckIfEmulatorRunning(CancellationToken token)
+    {
+        return Task.Run(async () =>
+        {
+            try
+            {
+                while (token.IsCancellationRequested == false)
+                {
+                    bool processExists = Process.GetProcesses()
+                        .Any(p => p.ProcessName.ToUpper().Contains(Config.Instance.Emulator.ToUpper()));
+                    if (processExists) this.Send(new MessagePlaying());
+                    await Task.Delay(1000, token);
+                }
+            }
+            catch (OperationCanceledException e)
+            {
+                Console.WriteLine("CheckIfEmulatorRunning aborted");
+            }
+        }, token);
+    }
+
     public Task Start(CancellationToken token)
+    {
+        Task running = this.CheckIfEmulatorRunning(token);
+        Task listen = this.Listen(token);
+
+        return Task.WhenAll(running, listen);
+    }
+
+    private Task Listen(CancellationToken token)
     {
         return Task.Run(() =>
         {

@@ -14,6 +14,7 @@ public class Config
     public string SaveFile { get; set; } = "save.file";
     public string ServerAddress { get; set; } = "127.0.0.1";
     public int ServerPort { get; set; } = 8888;
-
     public string Password { get; set; } = "TEST";
+
+    public string Emulator { get; set; } = "Dolphin";
 }
