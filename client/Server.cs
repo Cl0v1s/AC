@@ -19,9 +19,8 @@ public class Server
         this._context = context;
         this._socket = new TcpClient(Config.Instance.ServerAddress, Config.Instance.ServerPort);
         
-        this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
+        this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash, Village.Instance.Playing));
         Village.Instance.FileChanged += this.OnVillageChanged;
-        
     }
 
     ~Server()
@@ -31,7 +30,7 @@ public class Server
 
     private void OnVillageChanged()
     {
-        this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
+        this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash, Village.Instance.Playing));
     }
 
     private Task CheckIfEmulatorRunning(CancellationToken token)
@@ -44,8 +43,12 @@ public class Server
                 {
                     bool processExists = Process.GetProcesses()
                         .Any(p => p.ProcessName.ToUpper().Contains(Config.Instance.Emulator.ToUpper()));
-                    if (processExists) this.Send(new MessagePlaying());
-                    await Task.Delay(1000, token);
+                    if (processExists != Village.Instance.Playing)
+                    {
+                        Village.Instance.Playing = processExists;
+                        this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash, Village.Instance.Playing));
+                    }
+                    await Task.Delay(10000, token);
                 }
             }
             catch (OperationCanceledException e)
@@ -112,11 +115,25 @@ public class Server
         Console.WriteLine("Sent " + message.Type);
     }
 
+    private string Ok()
+    {
+        if (Village.Instance.Playing)
+        {
+            return "<Someone is playing...>";
+        }
+        else
+        {
+            return "<Connected...>";
+        }
+    }
+
     private async void Handle(Message message)
     {
         Console.WriteLine("Handled " + message.Type);
         if (message is MessageState state)
         {
+            Village.Instance.Playing = state.Playing;
+            this._context.State = this.Ok();
             if (state.Hash == Village.Instance.Hash || state.ModifiedAt < Village.Instance.ModifiedAt) return;
             // we are out of date
             this._context.State = "<Syncing...>";
@@ -128,12 +145,12 @@ public class Server
         } else if (message is MessagePush push)
         {
             // received a version
-            this._context.State = "<Connected...>";
+            this._context.State = this.Ok();
             string hash = Message.ComputeHash(push.Content);
             if (hash != Village.Instance.Hash && push.ModifiedAt < Village.Instance.ModifiedAt)
             {
                 // we are newer than received, so we answer with our village
-                this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash));
+                this.Send(new MessageState(Village.Instance.Password, Village.Instance.ModifiedAt, Village.Instance.Hash, Village.Instance.Playing));
                 return;
             }
             // else we are out of date so we replace local village

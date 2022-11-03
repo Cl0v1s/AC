@@ -24,6 +24,8 @@ public class Village : IVillage
     {
         return Task.Run(() => this._content!) ;
     }
+    
+    public bool Playing { get; set; }
 
     private byte[]? _content;
 
@@ -38,6 +40,7 @@ public class Village : IVillage
         this._watcher.EnableRaisingEvents = true;
 
         this.Password = password;
+        this.Playing = false;
         this.Load();
     }
 

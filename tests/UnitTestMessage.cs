@@ -31,10 +31,11 @@ public class UnitTestMessage
         string password = "test";
         DateTime modifiedAt = new DateTime();
         string hash = "hash";
+        bool playing = true;
         
         MemoryStream stream = new MemoryStream();
         BinaryWriter bw = new BinaryWriter(stream);
-        MessageState state = new MessageState(password, modifiedAt, hash);
+        MessageState state = new MessageState(password, modifiedAt, hash, playing);
         state.Serialize(bw);
         
         Message? ns = Message.Parse(stream.ToArray());
@@ -45,6 +46,7 @@ public class UnitTestMessage
         Assert.AreEqual(state.Password, newState.Password);
         Assert.AreEqual(state.ModifiedAt, newState.ModifiedAt);
         Assert.AreEqual(state.Hash, newState.Hash);
+        Assert.AreEqual(state.Playing, newState.Playing);
     }
 
     [TestMethod]

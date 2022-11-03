@@ -6,4 +6,6 @@ public interface IVillage
     public DateTime ModifiedAt { get; set; }
     public string Hash { get; set; }
     public Task<byte[]> GetContent();
+    
+    public bool Playing { get; set; }
 }

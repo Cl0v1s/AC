@@ -5,16 +5,56 @@ namespace AnimalCrossing.Server;
 public class Village : IVillage
 {
     public string Password { get; set; }
-    private List<Client> Clients { get; set; } = new List<Client>();
+    public List<Client> Clients { get; private set; } = new List<Client>();
 
     public DateTime ModifiedAt { get; set; } = new DateTime(1970, 1, 1);
     public string Hash { get; set; } = "A HOUSE IN A MIDDLE OF A";
+
+    private bool _playing;
+    private Task _resetPlaying;
+    private CancellationTokenSource _cancelResetPlaying = new CancellationTokenSource();
+
+    public bool Playing
+    {
+        get => this._playing;
+
+        set
+        {
+            if (this._playing != value)
+            {
+                // if we are entering playing mode, we set a reset operation after 10min
+                if (value)
+                {
+                    this._cancelResetPlaying.Cancel();
+                    this._cancelResetPlaying = new CancellationTokenSource();
+                    CancellationToken token = this._cancelResetPlaying.Token;
+                    this._resetPlaying = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await Task.Delay(1000 * 60 * 5, token);
+                            this.Playing = false;
+                        }
+                        catch (OperationCanceledException e)
+                        {
+                            Console.WriteLine("Playing reset canceled.");
+                        }
+                    }, token);
+                }
+                this.Clients.ForEach((c) => c.Send(new MessageState(this.Password, this.ModifiedAt, this.Hash, value)));
+            }
+
+            this._playing = value;
+        }
+
+    }
  
     private Client? _newest;
     
     public Village(string password)
     {
         this.Password = password;
+        this.Playing = false;
     }
 
     ~Village()
@@ -83,14 +123,14 @@ public class Village : IVillage
         this.Clients.ForEach((c) =>
         {
             if (c == cl) return;
-            c.Send(new MessageState(this.Password, this.ModifiedAt, this.Hash));
+            c.Send(new MessageState(this.Password, this.ModifiedAt, this.Hash, this.Playing));
         });
     }
 
-    public void AddClient(Client client, string hash, DateTime modifiedAt)
+    public void AddClient(Client client, string hash, DateTime modifiedAt, bool playing)
     {
         this.Clients.Add(client);
-        this.Compare(client, hash, modifiedAt);
+        this.Compare(client, hash, modifiedAt, playing);
         // if we have two or more clients we remove the File
         if (this.Clients.Count >= 2)
         {
@@ -98,18 +138,21 @@ public class Village : IVillage
         }
     }
 
-    public void Compare(Client client, string hash, DateTime modifiedAt)
+    public void Compare(Client client, string hash, DateTime modifiedAt, bool playing)
     {
         client.OnPushReceived += OnPushClientsChanged;
         if (hash != this.Hash && modifiedAt > this.ModifiedAt)
         {
             client.Send(new MessagePull());
             this._newest = client;
+            return;
         }
-        else
+        // manage playing state
+        if (playing != this.Playing)
         {
-            client.Send(new MessageState(this.Password, this.ModifiedAt, this.Hash));
+            this.Playing = playing;
         }
+        client.Send(new MessageState(this.Password, this.ModifiedAt, this.Hash, this.Playing));
     }
 
     public void RemoveClient(Client client)

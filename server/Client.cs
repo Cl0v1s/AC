@@ -125,11 +125,11 @@ public class Client
                     Villages.Add(village);
                 }
                 this._village = village;
-                this._village.AddClient(this, state.Hash, state.ModifiedAt);
+                this._village.AddClient(this, state.Hash, state.ModifiedAt, state.Playing);
             }
             else
             {
-                this._village.Compare(this, state.Hash, state.ModifiedAt);
+                this._village.Compare(this, state.Hash, state.ModifiedAt, state.Playing);
             }
         } else if (message is MessagePush push)
         {
